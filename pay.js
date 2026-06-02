@@ -194,7 +194,7 @@ export async function buyWithCashfree(packageData) {
 
   try {
     // ←←← UPDATE THIS URL WITH YOUR RAILWAY URL ←←←
-    const backendUrl = "https://payment-backend-production-436d.up.railway.app";
+    const backendUrl = "https://payment-backend-production-0b8d.up.railway.app";
 
     const res = await fetch(`${backendUrl}/create-order`, {
       method: "POST",
