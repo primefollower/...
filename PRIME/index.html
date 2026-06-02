@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="PRIME ASSISTANT — Your premium AI assistant for instant help and answers." />
+  <meta name="theme-color" content="#0a0a1a" />
+  <title>PRIME ASSISTANT</title>
+
+  <!-- Google Fonts: Inter + Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===================== TOAST NOTIFICATION ===================== -->
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <!-- ===================== DELETE CONFIRMATION MODAL ===================== -->
+  <div id="deleteModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-icon">🗑️</div>
+      <h3 class="modal-title">Are you sure you want to delete this?</h3>
+      <p class="modal-subtitle">This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button id="modalCancelBtn" class="modal-btn modal-btn--cancel">Cancel</button>
+        <button id="modalDeleteBtn" class="modal-btn modal-btn--delete">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== RENAME MODAL ===================== -->
+  <div id="renameModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-icon">✏️</div>
+      <h3 class="modal-title">Rename Chat</h3>
+      <input type="text" id="renameInput" class="rename-input" placeholder="Enter new name..." maxlength="40" />
+      <div class="modal-actions">
+        <button id="renameCancelBtn" class="modal-btn modal-btn--cancel">Cancel</button>
+        <button id="renameSaveBtn" class="modal-btn modal-btn--save">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== DRAWER OVERLAY ===================== -->
+  <div id="drawerOverlay" class="drawer-overlay"></div>
+
+  <!-- ===================== CHAT HISTORY DRAWER ===================== -->
+  <aside id="chatDrawer" class="drawer" aria-label="Chat history">
+    <div class="drawer-header">
+      <h2 class="drawer-title">Recent Chats</h2>
+      <button id="drawerCloseBtn" class="drawer-close" aria-label="Close drawer">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div id="drawerChatList" class="drawer-chat-list">
+      <!-- Chat items rendered by JS -->
+    </div>
+
+    <div class="drawer-footer">
+      <p>Only last 3 chats are stored</p>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN APP SHELL ===================== -->
+  <div class="app-shell">
+
+    <!-- ====== TOP HEADER ====== -->
+    <header class="top-header" id="topHeader">
+      <button id="hamburgerBtn" class="header-btn hamburger-btn" aria-label="Open chat history">
+        <span></span><span></span><span></span>
+      </button>
+
+      <h1 class="header-title">PRIME ASSISTANT</h1>
+
+      <!-- New Chat Button -->
+      <button id="newChatBtn" class="header-btn new-chat-btn" aria-label="New Chat" title="New Chat">
+        💬
+      </button>
+
+      <button id="closeBtn" class="header-btn close-btn" aria-label="Go to Home">
+        
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="url(#goldGrad)" stroke-width="3" stroke-linecap="round">
+          <defs>
+            <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffd700"/>
+              <stop offset="50%" stop-color="#ffb347"/>
+              <stop offset="100%" stop-color="#ffd700"/>
+            </linearGradient>
+          </defs>
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- ====== CHAT MESSAGES AREA ====== -->
+    <main class="chat-area" id="chatArea">
+      <!-- Messages rendered by JS -->
+    </main>
+
+    <!-- ====== INPUT AREA ====== -->
+    <footer class="input-area" id="inputArea">
+      <div class="input-container">
+        <textarea
+          id="messageInput"
+          class="message-input"
+          placeholder="Ask anything"
+          rows="1"
+          aria-label="Type your message"
+        ></textarea>
+        <button id="sendBtn" class="send-btn" aria-label="Send message" disabled>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+      <div class="word-count" id="wordCount">0 / 100 words</div>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

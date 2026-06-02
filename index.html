@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="Prime-Follower - Watch ads, earn credits, and order Instagram followers." />
+  <title>Prime-Follower</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- App Styles -->
+<link rel="stylesheet" href="app-styles.css">
+ 
+
+  
+
+  <!-- QR Code Library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+
+<!-- Razorpay Checkout Script -->
+<script async src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+
+  <!-- AdSense (replace with your real pub ID) -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+</head>
+
+
+<body>
+
+
+  <!-- FULL SCREEN LOADER -->
+<div id="load2s-overlay">
+  <iframe src="LOAD2S/index.html" frameborder="0"></iframe>
+</div>
+
+  <!-- ═══ DESKTOP BLOCKING OVERLAY ═══ -->
+  <div id="desktop-overlay">
+    <div class="overlay-icon">📱</div>
+    <h2>This platform is only available on mobile devices.</h2>
+    <p>Please open Prime-Follower on your phone for the best experience.</p>
+    <button class="btn-qr-show" id="btn-show-qr">📲 Show QR Code</button>
+  </div>
+
+  <!-- ═══ QR CODE MODAL ═══ -->
+  <div class="qr-modal" id="qr-modal">
+    <div class="qr-modal-card">
+      <h3>Scan this QR on your phone</h3>
+      <div id="qr-code-container"></div>
+      <p class="qr-label">Open on phone:</p>
+      <div class="qr-link-row">
+        <input type="text" id="qr-site-link" readonly />
+        <button class="btn-copy-link" id="btn-copy-link"><i class="fas fa-copy"></i></button>
+      </div>
+  <button class="btn-primary btn-full mt-20" id="qr-modal-close">
+Close
+</button>
+
+
+    </div>
+  </div>
+
+<!-- ═══ DNS BLOCKER WARNING (BOTTOM 2/3 + BLUR) ═══ -->
+<div id="dns-warning-overlay" style="display: none; position: fixed; inset: 0; z-index: 999999; 
+     background: rgba(0, 0, 0, 0.55); 
+     backdrop-filter: blur(12px); 
+     -webkit-backdrop-filter: blur(12px);
+     align-items: flex-end; 
+     justify-content: center; 
+     pointer-events: all;">
+
+  <div onclick="event.stopImmediatePropagation()" 
+       style="width: 100%; max-width: 420px; background: #0f172a; border-radius: 28px 28px 0 0; 
+              padding: 32px 24px 40px; text-align: center; box-shadow: 0 -10px 40px rgba(0,0,0,0.7);">
+
+    <!-- Logo -->
+    <div style="margin-bottom: 18px;">
+      <img src="insta.jpeg" alt="Prime" 
+           style="width: 105px; height: 105px; border-radius: 22px; box-shadow: 0 0 35px rgba(255,215,0,0.5);">
+    </div>
+
+    <!-- Title -->
+    <h2 style="color: #FFD700; font-size: 25px; font-weight: 900; margin-bottom: 14px; 
+               text-shadow: 0 0 18px rgba(255,215,0,0.7); letter-spacing: 0.5px;">
+      PRIME FOLLOWER
+    </h2>
+
+    <!-- Message -->
+    <p style="color: #e2e8f0; font-size: 15px; line-height: 1.55; margin-bottom: 26px; padding: 0 8px;">
+      WE DETECTED THAT YOU ARE USING PRIVATE DNS.<br>
+      PLEASE DISABLE THAT DNS TO GET FREE FOLLOWERS<br>
+      BY OUR APPLICATION.
+    </p>
+
+    <!-- Button -->
+    <button id="dns-disable-btn" 
+            style="width: 100%; max-width: 280px; background: #3b82f6; color: white; 
+                   font-size: 15.5px; font-weight: 700; padding: 15px 0; border: none; 
+                   border-radius: 50px; box-shadow: 0 6px 20px rgba(59, 130, 246, 0.45);">
+      I WILL DISABLE THAT
+    </button>
+
+  </div>
+</div>
+
+  <!-- ═══ FLOATING ELEMENTS ═══ -->
+  <div class="floating-credits" id="floating-credits">
+  <img src="icons/cashbag.png" class="nav-icon">
+    <span>Credits: <b id="credit-count">0</b></span>
+  </div>
+
+  <div class="floating-profile" id="floating-profile">
+  <img id="user-avatar" src="avatars/user1.jpg" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">
+</div>
+
+
+
+  <div id="page-avatar" class="page-section">
+
+    <button id="avatar-close-btn">✕</button>
+
+<h2 class="page-title">
+  Choose Your<br>Avatar
+</h2>
+
+  <div class="avatar-grid" id="avatar-grid"></div>
+
+<button id="confirm-avatar-btn" class="btn-primary">
+  ✅ Confirm Selection
+</button>
+
+</div>
+
+
+  <!-- ═══ PROFILE MODAL ═══ -->
+  <div class="profile-modal" id="profile-modal">
+    <div class="profile-card">
+    <div class="profile-avatar" id="profile-avatar-click">
+  <img id="profile-avatar-img" src="avatars/user1.jpg" />
+</div>
+      <h3 id="profile-username">User</h3>
+      <p id="profile-email">user@email.com</p>
+      <div class="profile-details">
+        <div class="profile-detail-row">
+          <span class="detail-label"><i class="fas fa-coins"></i> Credits</span>
+          <span class="detail-value" id="profile-credits">0</span>
+        </div>
+        <div class="profile-detail-row">
+          <span class="detail-label"><i class="fas fa-calendar"></i> Joined</span>
+          <span class="detail-value" id="profile-joined">—</span>
+        </div>
+        <div class="profile-detail-row">
+          <span class="detail-label"><i class="fas fa-trophy"></i>Life Time Earned</span>
+          <span class="detail-value" id="profile-total-earned">0</span>
+        </div>
+      </div>
+      <button class="profile-close" id="profile-close">Close</button>
+    </div>
+  </div>
+
+  <!-- ═══ COMING SOON OVERLAY (Refer) ═══ -->
+  <div class="coming-soon-overlay" id="coming-soon-overlay">
+    <div class="coming-soon-card">
+      <i class="fas fa-rocket"></i>
+      <h3>Coming Soon</h3>
+      <p>The refer & earn feature is under development. Stay tuned!</p>
+      <button class="btn-primary" id="coming-soon-close">Got It</button>
+    </div>
+  </div>
+
+  <!-- ═══ ORDER RULES MODAL ═══ -->
+  <div class="modal-overlay" id="rules-modal">
+<div class="modal-content">
+  <div class="modal-box">
+      <h3>📋 Order Rules</h3>
+      <div class="rules-text">
+        <ol>
+          <li>Followers will be delivered within 24 hours of placing the order.</li>
+          <li>Make sure your Instagram account is set to <b>Public</b> before ordering.</li>
+          <li>Do not change your username during the delivery period.</li>
+          <li>Each account has a maximum limit of <b>100000/100k followers</b>.</li>
+          <li>Credits spent on orders are <b>non-refundable</b>.</li>
+          <li>We are not responsible for any follower drop after delivery.</li>
+          <li>Abusing the system may result in account suspension.</li>
+        </ol>
+      </div>
+      <label class="rules-agree">
+  <input type="checkbox" id="rules-agree">
+  I agree to terms and conditions
+</label>
+
+      <button class="btn-primary btn-full" id="rules-agree-btn">NEXT</button>
+
+</div> <!-- modal-box -->
+</div> <!-- modal-content -->
+</div> <!-- modal-overlay -->
+
+  <!-- ═══ ORDER USERNAME MODAL ═══ -->
+<div class="modal-overlay" id="username-modal">
+  <div class="modal-content">
+    <div class="modal-box">
+      <h3>📸 Enter Instagram Details</h3>
+
+      <input class="modal-input" id="order-ig-username" type="text"
+        placeholder="Instagram Username (e.g. @johndoe)" />
+
+      <input class="modal-input" id="order-ig-link" type="url"
+        placeholder="Instagram Profile Link" />
+
+      <button class="btn-primary btn-full mt-20" id="confirm-order-btn">
+        CONFIRM ORDER
+      </button>
+
+      <button class="btn-outline btn-full mt-12" id="cancel-order-btn">
+        Cancel
+      </button>
+
+    </div>
+  </div>
+</div>
+
+  <!-- ═══ CELEBRATION POPUP ═══ -->
+  <div class="celebration-overlay" id="celebration-overlay">
+    <div class="celebration-card">
+      <div class="celebration-icon">🎉</div>
+      <h3>Congratulations!</h3>
+      <p>Your followers have been delivered successfully.</p>
+      <button class="btn-primary btn-gold" id="celebration-close">Awesome!</button>
+    </div>
+  </div>
+
+
+
+
+<!-- PAYMENT CONFIRMATION BOTTOM SHEET -->
+<div class="modal-overlay" id="payment-confirm-modal" style="align-items: flex-end; background:rgba(0,0,0,0.8); backdrop-filter: blur(16px); padding:0; margin:0;">
+  <div style="width:100%; max-width:480px; background:white; border-radius:24px 24px 0 0; padding:28px 20px 40px; text-align:center; box-shadow:0 -10px 40px rgba(0,0,0,0.25); border-top:3px solid #8b8b8b;">
+    <img src="insta.jpeg" style="width:92px; height:92px; border-radius:18px; margin-bottom:18px; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
+    <h3 style="font-size:23px; font-weight:800; margin:8px 0 18px; color:#1a1a2e;">PAY TO PRIME FOLLOWER</h3>
+    <p id="confirm-text" style="font-size:17.5px; line-height:1.55; color:#1f2937; margin-bottom:28px; font-weight:700;"></p>
+    
+    <div style="display:flex; gap:12px;">
+      <button onclick="cancelPaymentConfirm()" 
+              style="flex:1; padding:16px; background:#d9d9d9; color:#374151; border:none; border-radius:50px; font-weight:700; font-size:16px;">
+        CANCEL
+      </button>
+      <button onclick="proceedToCashfree()"
+              style="flex:1; padding:16px; background:#2563eb; color:white; border:none; border-radius:50px; font-weight:700; font-size:16px;">
+        PROCEED
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- INSTAGRAM DETAILS MODAL (Bottom Sheet) -->
+<div class="modal-overlay" id="instagram-details-modal" style="align-items: flex-end; background:rgba(0,0,0,0.85); backdrop-filter: blur(16px); padding:0;">
+  <div style="width:100%; max-width:480px; background:white; border-radius:24px 24px 0 0; padding:28px 20px 40px; text-align:center; box-shadow:0 -10px 40px rgba(0,0,0,0.3);">
+    <img src="insta.jpeg" style="width:85px; height:85px; border-radius:18px; margin-bottom:16px;">
+    <h3 style="font-size:24px; font-weight:800; margin-bottom:20px; color:#1a1a2e;">Enter Instagram Details</h3>
+    
+    <input class="modal-input" id="paid-ig-username" type="text" placeholder="Instagram Username (e.g. @johndoe)" style="margin-bottom:14px;">
+    <input class="modal-input" id="paid-ig-link" type="url" placeholder="Instagram Profile Link">
+
+    <button id="confirm-instagram-btn" class="btn-primary btn-full mt-20" style="background:#ff3b5c; padding:16px; font-size:17px;">
+      CONFIRM
+    </button>
+    
+    <button onclick="closeInstagramModal()" class="btn-outline btn-full mt-12" style="color:#ff3b5c; border-color:#ff3b5c;">
+      Cancel
+    </button>
+  </div>
+</div>
+
+
+
+
+
+<!-- PAYMENT SUCCESS MODAL -->
+<div class="modal-overlay" id="payment-success-modal">
+  <div class="modal-content">
+    <div class="modal-box" style="background: linear-gradient(135deg, #0f172a, #1e2937); color:white; text-align:center; padding:30px 20px; border-radius:20px;">
+      <img src="insta.jpeg" style="width:110px; height:110px; border-radius:20px; margin-bottom:15px;">
+      <h2 style="color:#22c55e; font-size:26px; margin:10px 0;">ORDER SUCCESSFULL</h2>
+      <p id="success-details" style="font-size:16px; line-height:1.6; margin:15px 0;"></p>
+      <button onclick="closePaymentModal()" style="background:#22c55e; color:white; padding:14px 40px; border:none; border-radius:50px; font-weight:700; font-size:16px; width:100%;">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT CANCELLED MODAL -->
+<div class="modal-overlay" id="payment-cancel-modal">
+  <div class="modal-content">
+    <div class="modal-box" style="background: linear-gradient(135deg, #0f172a, #1e2937); color:white; text-align:center; padding:30px 20px; border-radius:20px;">
+      <img src="insta.jpeg" style="width:110px; height:110px; border-radius:20px; margin-bottom:15px;">
+      <h2 style="color:#ef4444; font-size:26px; margin:10px 0;">ORDER CANCELLED</h2>
+      <p style="font-size:16px; line-height:1.6; margin:15px 0;">
+        ORDER CANCELLED SUCCESSFULLY<br><br>
+        NO MONEY IS DEDUCTED FROM YOUR ACCOUNT
+      </p>
+      <button onclick="closePaymentModal()" style="background:#ef4444; color:white; padding:14px 40px; border:none; border-radius:50px; font-weight:700; font-size:16px; width:100%;">OK</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  <!-- ═══ DETAIL OVERLAY (More pages) ═══ -->
+<div class="detail-overlay" id="detail-overlay">
+
+  <div class="detail-header">
+
+
+
+
+    <button class="detail-back" id="detail-back">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+
+    <h3 id="detail-title">Title</h3>
+
+    <button class="detail-close" id="detail-close">✕</button>
+  </div>
+
+  <div class="detail-body" id="detail-body"></div>
+
+</div>
+
+  <!-- ═══ MAIN APP CONTAINER ═══ -->
+  <div id="app-container">
+
+    <!-- ════════ HOME PAGE ════════ -->
+    <div class="page-section active" id="page-home">
+      <h2 class="page-title">Prime-Follower</h2>
+
+      <!-- Daily Check-In -->
+      <div class="card checkin-card" id="checkin-card">
+        <div class="card-icon" style="background:rgba(255,255,255,0.2); margin: 0 auto 12px;">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+
+
+ 
+
+
+        <h3>Daily Check-In</h3>
+        <p>Tap to claim your daily bonus</p>
+        <div class="checkin-days" id="checkin-days">
+          <div class="checkin-day" data-day="1">
+            <div class="day-circle">1</div>
+            <span class="day-reward">+?</span>
+          </div>
+          <div class="checkin-day locked" data-day="2">
+            <div class="day-circle">🔒</div>
+            <span class="day-reward">+?</span>
+          </div>
+          <div class="checkin-day locked" data-day="3">
+            <div class="day-circle">🔒</div>
+            <span class="day-reward">+?</span>
+          </div>
+          <div class="checkin-day locked" data-day="4">
+            <div class="day-circle">🔒</div>
+            <span class="day-reward">+?</span>
+          </div>
+          <div class="checkin-day locked" data-day="5">
+            <div class="day-circle">🔒</div>
+            <span class="day-reward">+?
+            </span>
+          </div>
+          <div class="checkin-day locked" data-day="6">
+            <div class="day-circle">🔒</div>
+            <span class="day-reward">+?</span>
+          </div>
+          <div class="checkin-day locked day-seven" data-day="7">
+            <div class="day-circle">🎁</div>
+            <span class="day-reward">Grand Prize</span>
+          </div>
+        </div>
+
+
+        
+        <div class="ad-progress-container">
+  <div class="ad-progress-text" id="ad-progress-text">
+    Watch ads to unlock rewards
+  </div>
+  <div class="ad-progress-bar">
+    <div class="ad-progress-fill" id="ad-progress-fill"></div>
+  </div>
+</div>
+
+
+        <button class="btn-checkin" id="btn-checkin">🎁 CLAIM</button>
+      </div>
+
+      <!-- Watch Ads -->
+      <div class="card watch-ad-card" id="watch-ad-card">
+        <div class="card-icon" style="background:rgba(255,255,255,0.2); margin: 0 auto 12px;">
+          <i class="fas fa-play-circle"></i>
+        </div>
+        <h3>Watch Ad</h3>
+        <p>Earn credits instantly</p>
+        <button class="btn-watch-ad" id="btn-watch-ad">▶ WATCH AD</button>
+        <div class="ad-count" id="ad-count">0 / 20 ads today</div>
+      </div>
+
+
+
+      <!-- Spin / Try Your Luck -->
+      <div class="card spin-card" id="spin-card">
+        <div class="card-icon" style="background:rgba(255,255,255,0.2); margin: 0 auto 12px;">
+          <i class="fas fa-sync-alt"></i>
+        </div>
+        <h3>TRY YOUR LUCK</h3>
+        <p>Spin &amp; Win Credits</p>
+        <button class="btn-watch-ad" id="btn-spin-now" style="background: linear-gradient(135deg, #3b82f6, #1e40af);">🎰 SPIN NOW</button>
+        <div class="ad-count" id="spin-count">0 / 3 spins today</div>
+      </div>
+
+
+
+
+      <!-- Refer & Earn -->
+      <div class="card refer-card" id="refer-card">
+        <div class="card-icon" style="background:rgba(0,0,0,0.1); margin: 0 auto 12px;">
+          <i class="fas fa-user-plus"></i>
+        </div>
+        <h3>Refer Friends</h3>
+        <p>Earn bonus credits by inviting friends</p>
+      </div>
+
+
+      <!-- Telegram & WhatsApp Buttons - Full Width Stacked -->
+      <div style="margin-top:24px; padding:0 12px; display:flex; flex-direction:column; gap:14px;">
+        
+        <!-- Telegram Button -->
+        <button id="telegram-btn" onclick="window.open('https://t.me/Prime_follower', '_blank')" 
+                style="background:linear-gradient(135deg, #229ED9, #1E88E5); color:white; border:none; border-radius:16px; padding:18px 20px; font-size:16px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:12px; box-shadow:0 8px 25px rgba(34,158,217,0.35); width:100%;">
+          <img src="telegram.png" id="telegram-logo" style="width:35px; height:35px;">
+          JOIN US ON TELEGRAM
+        </button>
+
+        <!-- WhatsApp Button -->
+        <button id="whatsapp-btn" onclick="window.open('https://whatsapp.com/channel/0029Vb7wckFKAwElW0zWuF2P', '_blank')" 
+                style="background:linear-gradient(135deg, #25D366, #20B354); color:white; border:none; border-radius:16px; padding:18px 20px; font-size:16px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:12px; box-shadow:0 8px 25px rgba(37,211,102,0.35); width:100%;">
+          <img src="whatsapp.png" id="whatsapp-logo" style="width:63px; height:63px;">
+          JOIN OUR WHATSAPP CHANNEL
+        </button>
+
+      </div>
+    </div>
+
+    <!-- ════════ ORDER PAGE ════════ -->
+    <div class="page-section" id="page-order">
+      <h2 class="page-title">INSTA FOLLOWERS</h2>
+
+<div class="order-grid" id="order-grid">
+
+<!-- 3 Followers (First Order FREE) -->
+<div class="order-card red" id="first-free-card" data-followers="3" data-cost="5">
+  <div class="insta-icon"><img src="insta.jpeg" alt="Instagram" /></div>
+  <div class="order-info">
+    <h4>Get 3 Followers</h4>
+    <span id="first-cost-text">Cost: 5 Credits</span>
+  </div>
+  <button class="btn-order" id="first-order-btn">FREE</button>
+</div>
+
+  <!-- 10 Followers -->
+  <div class="order-card yellow" data-followers="10" data-cost="11">
+    <div class="insta-icon"><img src="insta.jpeg" alt="Instagram" /></div>
+    <div class="order-info">
+      <h4>Get 10 Followers</h4>
+      <span>Cost: 11 Credits</span>
+    </div>
+    <button class="btn-order">ORDER</button>
+  </div>
+
+  <!-- 25 Followers -->
+  <div class="order-card green" data-followers="25" data-cost="25">
+    <div class="insta-icon"><img src="insta.jpeg" alt="Instagram" /></div>
+    <div class="order-info">
+      <h4>Get 25 Followers</h4>
+      <span>Cost: 25 Credits</span>
+    </div>
+    <button class="btn-order">ORDER</button>
+  </div>
+
+  <!-- 50 Followers -->
+  <div class="order-card blue" data-followers="50" data-cost="49">
+    <div class="insta-icon"><img src="insta.jpeg" alt="Instagram" /></div>
+    <div class="order-info">
+      <h4>Get 50 Followers</h4>
+      <span>Cost: 49 Credits</span>
+    </div>
+    <button class="btn-order">ORDER</button>
+  </div>
+
+  <!-- NEW: 100 Followers (Light Purple) -->
+  <div class="order-card purple" data-followers="100" data-cost="95">
+    <div class="insta-icon"><img src="insta.jpeg" alt="Instagram" /></div>
+    <div class="order-info">
+      <h4>Get 100 Followers</h4>
+      <span>Cost: 95 Credits</span>
+    </div>
+    <button class="btn-order">ORDER</button>
+  </div>
+
+  <!-- 500 Followers (Best Value) -->
+  <div class="order-card gold" data-followers="500" data-cost="450">
+    <span class="best-value-badge">⭐ BEST VALUE</span>
+    <div class="insta-icon"><img src="insta.jpeg" alt="Instagram" /></div>
+    <div class="order-info">
+      <h4>Get 500 Followers</h4>
+      <span>Cost: 450 Credits</span>
+    </div>
+    <button class="btn-order">ORDER</button>
+  </div>
+
+<!-- 🔥 NEW: REAL MONEY BUY CARD -->
+<div class="order-card premium-buy" id="premium-buy-card">
+  <span class="best-value-badge" style="background:#FFD700;color:#1a1a2e;">🔥 HOT DEAL</span>
+  <div class="insta-icon"><img src="insta.jpeg" alt="Instagram" /></div>
+  <div class="order-info">
+    <h4>Non-Drop Followers</h4>
+    <span style="color:#cdcdcd;font-weight:700;">Cheaper than Mobile Recharge!</span>
+  </div>
+  <button class="btn-order" id="btn-open-buy">BUY NOW</button>
+</div>
+
+
+</div>
+
+      <!-- Order Progress -->
+      <div class="order-progress" id="order-progress">
+        <h4>📦 Order in Progress</h4>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="progress-bar-fill"></div>
+        </div>
+        <div class="countdown-timer" id="countdown-timer">--:--:--</div>
+      </div>
+    </div>
+
+    <!-- ════════ WALLET PAGE ════════ -->
+    <div class="page-section" id="page-wallet">
+      <h2 class="page-title">Wallet</h2>
+
+      <div class="wallet-balance">
+        <div class="balance-label">Current Balance</div>
+        <div class="balance-value" id="wallet-balance">0<span class="balance-unit">Credits</span></div>
+      </div>
+
+      <div class="wallet-tabs">
+        <button class="wallet-tab active" data-tab="redeem">Order History</button>
+        <button class="wallet-tab" data-tab="point">Credit History</button>
+      </div>
+
+      <div class="transaction-list" id="transaction-list">
+        <div class="empty-state">
+          <i class="fas fa-receipt"></i>
+          <p>No transactions yet</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ CONTACT PAGE ════════ -->
+    <div class="page-section" id="page-contact">
+      <h2 class="page-title">Contact Us</h2>
+
+      <div class="contact-form" id="contact-form">
+        <label for="contact-subject">Subject</label>
+        <select class="contact-select" id="contact-subject">
+          <option value="" disabled selected>Select a subject</option>
+          <option value="Redeem Problem">Order Problem</option>
+          <option value="Point Inquiry">Point Inquiry</option>
+          <option value="General Feedback">General Feedback</option>
+          <option value="Others">Others</option>
+        </select>
+
+        <label for="contact-message">Describe your issue</label>
+<textarea class="contact-textarea" id="contact-message" placeholder="Select a subject first..."></textarea>
+
+        <button class="btn-primary btn-full mt-20" id="btn-send-message">
+          <i class="fas fa-paper-plane"></i> Send Message
+        </button>
+      </div>
+    </div>
+
+    <!-- ════════ MORE PAGE ════════ -->
+    <div class="page-section" id="page-more">
+      <h2 class="page-title">More-Options</h2>
+
+      <div class="more-list">
+        <div class="more-item" data-page="about">
+          <i style="background:linear-gradient(135deg,#667eea,#764ba2)"><span class="fas fa-info-circle"></span></i>
+          <span>About Us</span>
+          <i class="fas fa-chevron-right chevron"></i>
+        </div>
+        <div class="more-item" data-page="privacy">
+          <i style="background:linear-gradient(135deg,#f093fb,#f5576c)"><span class="fas fa-shield-halved"></span></i>
+          <span>Privacy Policy</span>
+          <i class="fas fa-chevron-right chevron"></i>
+        </div>
+        <div class="more-item" data-page="terms">
+          <i style="background:linear-gradient(135deg,#4facfe,#00f2fe)"><span class="fas fa-file-contract"></span></i>
+          <span>Terms & Conditions</span>
+          <i class="fas fa-chevron-right chevron"></i>
+        </div>
+        <div class="more-item" data-page="help">
+          <i style="background:linear-gradient(135deg,#43e97b,#38f9d7)"><span class="fas fa-circle-question"></span></i>
+          <span>Help / FAQ</span>
+          <i class="fas fa-chevron-right chevron"></i>
+        </div>
+
+        <div class="more-item logout" id="btn-logout">
+          <i><span class="fas fa-right-from-bracket"></span></i>
+          <span>Logout</span>
+        </div>
+      </div>
+    </div>
+
+  <!-- ═══ LOGOUT CONFIRMATION MODAL ═══ -->
+  <div class="logout-modal" id="logout-modal">
+    <div class="logout-modal-card">
+      <p class="logout-message">Are you sure you want to logout 🤨</p>
+      <div class="logout-btn-row">
+        <button class="logout-btn-cancel" id="logout-cancel">Cancel</button>
+        <button class="logout-btn-yes" id="logout-yes">Yes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ GIFT ANIMATION OVERLAY (Day 7) ═══ -->
+  <div class="gift-overlay" id="gift-overlay">
+    <div class="gift-box-container">
+      <div class="gift-box" id="gift-box">
+        <div class="gift-lid">🎁</div>
+      </div>
+      <div class="gift-confetti" id="gift-confetti"></div>
+      <div class="gift-reward" id="gift-reward">
+        <h3>🎉 Grand Prize!</h3>
+        <p id="gift-reward-text">+5 Credits</p>
+        <button class="btn-primary btn-gold mt-20" id="gift-close">Collect</button>
+      </div>
+    </div>
+  </div>
+
+
+
+<!-- ════════ BUY FOLLOWERS PAGE ════════ -->
+<div class="page-section" id="page-buy">
+  <h2 class="page-title">BUY FOLLOWERS</h2>
+  
+  <div class="buy-grid" id="buy-grid">
+
+<!-- 🔥 LIMITED TIME GOLDEN HANGING BLOCK (100 Followers) -->
+<div class="order-card gold hanging-sign limited-offer" id="limited-offer-card" data-package="100" data-amount="11" style="display:none;">
+
+  <div class="wooden-sign">
+    <div class="premium-golden-card">
+      <div class="crown">👑</div>
+
+      <div class="insta-icon"><img src="insta.jpeg" alt="Instagram" /></div>
+
+      <h4>Get 100 Followers</h4>
+      <span class="cost-text">Cost: ₹11</span>
+
+      <button class="btn-pay golden-pay-btn">» PAY ₹11 «</button>
+    </div>
+  </div>
+
+  <small class="timer-text" id="timer-100">🕐 60:00</small>
+</div>
+
+    <!-- 50 Followers - Red -->
+    <div class="order-card red buy-card" data-package="100" data-amount="25">
+      <div class="insta-icon"><img src="insta.jpeg" alt="Instagram" /></div>
+      <div class="order-info">
+        <h4>Get 100 Followers</h4>
+        <span>Cost: ₹25</span>
+      </div>
+      <button class="btn-pay">PAY ₹25</button>
+    </div>
+
+    <!-- 200 Followers - Yellow -->
+    <div class="order-card yellow buy-card" data-package="200" data-amount="49">
+      <div class="insta-icon"><img src="insta.jpeg" alt="Instagram" /></div>
+      <div class="order-info">
+        <h4>Get 200 Followers</h4>
+        <span>Cost: ₹49</span>
+      </div>
+      <button class="btn-pay">PAY ₹49</button>
+    </div>
+
+    <!-- 400 Followers - Green -->
+    <div class="order-card green buy-card" data-package="400" data-amount="79">
+      <div class="insta-icon"><img src="insta.jpeg" alt="Instagram" /></div>
+      <div class="order-info">
+        <h4>Get 400 Followers</h4>
+        <span>Cost: ₹79</span>
+      </div>
+      <button class="btn-pay">PAY ₹79</button>
+    </div>
+
+    <!-- 1000 Followers - Blue -->
+    <div class="order-card blue buy-card" data-package="1000" data-amount="179">
+      <div class="insta-icon"><img src="insta.jpeg" alt="Instagram" /></div>
+      <div class="order-info">
+        <h4>Get 1000 Followers</h4>
+        <span>Cost: ₹179</span>
+      </div>
+      <button class="btn-pay">PAY ₹179</button>
+    </div>
+
+    <!-- 🔥 NEW: 2000 Followers - PREMIUM GOLD -->
+    <div class="order-card gold premium-buy-card buy-card" data-package="2000" data-amount="199" id="premium-2000-card">
+      <span class="best-value-badge" style="background:#1a1a2e;color:#FFD700;padding:4px 5px;font-size:10px;">👑 MOST POPULAR</span>
+      <div class="insta-icon"><img src="insta.jpeg" alt="Instagram" /></div>
+      <div class="order-info">
+        <h4 style="font-weight:800;">Get 2000 Followers</h4>
+        <span style="font-weight:700;">Cost: ₹199</span>
+      </div>
+      <button class="btn-pay golden-pay-btn">PAY ₹199</button>
+    </div>
+
+  </div>
+
+  <div class="buy-bottom-text">
+    <p><strong>YOU CAN ONLY ORDER ONCE EVERY 12 HOURS</p>
+    <p>WE PROMISE 120 DAYS NO DROP</strong></p>
+    <p><span id="how-link" style="color:#60a5fa;cursor:pointer;"> <strong> OUR FOLLOWERS ARE 100% NON-DROP→HOW? </strong> </span></p>
+  </div>
+</div>
+
+
+
+
+<!--
+  ══════════════════════════════════════════════════════════
+  PLACEMENT: Inside #app-container, AFTER the closing </div>
+  of page-more (id="page-more") and BEFORE the closing </div>
+  of #app-container.
+
+  Also REMOVE the old #coming-soon-overlay block entirely — 
+  the refer card now navigates to this real page.
+  ══════════════════════════════════════════════════════════
+-->
+
+<!-- ════════ REFER PAGE ════════ -->
+<div class="page-section" id="page-refer">
+
+  <!-- ── SECTION 1: Header ──────────────────────────────────── -->
+  <div class="refer-header">
+    <h2 class="refer-title">PRIME VIRAL BONUS</h2>
+    <p class="refer-subtitle">
+      Invite 3 friends &amp; unlock 500 FREE followers 🚀
+    </p>
+  </div>
+
+  <!-- ── SECTION 2: How It Works Label ─────────────────────── -->
+  <h3 class="refer-section-label">HOW REFER WORKS?</h3>
+
+  <!-- ── SECTION 3: Carousel ───────────────────────────────── -->
+  <div class="refer-carousel-wrapper">
+    <div class="refer-carousel-viewport">
+      <div class="refer-carousel-track" id="refer-carousel-track">
+        <!-- Slides injected by refer.js -->
+      </div>
+    </div>
+
+    <!-- Prev / Next buttons -->
+    <button class="refer-carousel-arrow refer-carousel-prev" id="refer-carousel-prev" aria-label="Previous slide">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    <button class="refer-carousel-arrow refer-carousel-next" id="refer-carousel-next" aria-label="Next slide">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+
+    <!-- Dots -->
+    <div class="refer-carousel-dots" id="refer-carousel-dots"></div>
+  </div>
+
+  <!-- ── SECTION 4: Referral Block ─────────────────────────── -->
+  <div class="refer-block-card">
+    <h3 class="refer-block-title">I WILL REFER FRIENDS</h3>
+
+    <!-- Referral Link -->
+    <div class="refer-link-group">
+      <p class="refer-link-label">Your referral link</p>
+      <div class="refer-link-row">
+        <input
+          id="refer-link-value"
+          class="refer-link-input"
+          type="text"
+          readonly
+          value="Loading..."
+          aria-label="Referral link"
+        />
+        <button class="refer-copy-btn" id="refer-copy-btn" aria-label="Copy referral link">
+          <i class="fas fa-copy"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="refer-progress-block">
+      <p class="refer-count-text" id="refer-count-text">0 / 3 referrals complete</p>
+      <div class="refer-progress-bar">
+        <div class="refer-progress-fill" id="refer-progress-fill"></div>
+      </div>
+      <p class="refer-status-text" id="refer-status-text">
+        Invite 3 friends to unlock the bonus
+      </p>
+    </div>
+
+    <!-- Rewards breakdown -->
+    <div class="refer-rewards-row">
+      <div class="refer-reward-step">
+        <span class="refer-reward-badge">1</span>
+        <span class="refer-reward-label">+10 Credits</span>
+      </div>
+      <div class="refer-reward-divider"></div>
+      <div class="refer-reward-step">
+        <span class="refer-reward-badge">2</span>
+        <span class="refer-reward-label">+25 Credits</span>
+      </div>
+      <div class="refer-reward-divider"></div>
+      <div class="refer-reward-step active">
+        <span class="refer-reward-badge gold">3</span>
+        <span class="refer-reward-label">500 Followers 🎁</span>
+      </div>
+    </div>
+
+    <!-- Share Button -->
+    <button class="refer-share-btn" id="refer-share-btn">
+      <i class="fas fa-share-alt"></i>&nbsp; SHARE LINK
+    </button>
+  </div>
+
+  <!-- ── SECTION 5: Claim Prime Viral Bonus ─────────────────── -->
+  <div class="refer-claim-section" id="refer-claim-section" style="display:none;">
+    <div class="refer-claim-card">
+      <div class="refer-claim-header">
+        <span class="refer-claim-icon">🎁</span>
+        <h3 class="refer-claim-title">CLAIM PRIME VIRAL BONUS</h3>
+        <p class="refer-claim-desc">Enter your Instagram details to receive 500 FREE followers</p>
+      </div>
+
+      <!-- Form -->
+      <div id="refer-claim-form">
+        <input
+          id="refer-claim-username"
+          class="refer-input"
+          type="text"
+          placeholder="Instagram Username (e.g. @yourname)"
+        />
+        <input
+          id="refer-claim-link"
+          class="refer-input"
+          type="url"
+          placeholder="Instagram Profile Link"
+        />
+        <button class="refer-claim-btn" id="refer-claim-submit">
+          CLAIM BONUS 🎁
+        </button>
+      </div>
+
+      <!-- Already claimed state -->
+      <div id="refer-claim-done" style="display:none;">
+        <div class="refer-claimed-badge">
+          <i class="fas fa-check-circle"></i>
+          <span>PRIME VIRAL BONUS request submitted. Our team will process it soon! 🚀</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 6: FAQ ──────────────────────────────────────── -->
+  <h3 class="refer-section-label" style="margin-top:32px;">ANY QUERY</h3>
+
+  <div class="refer-faq-list">
+
+    <div class="refer-faq-item">
+      <button class="refer-faq-trigger">
+        <span>❓ Is the PRIME VIRAL BONUS once per user?</span>
+        <i class="fas fa-chevron-down refer-faq-icon"></i>
+      </button>
+      <div class="refer-faq-body">
+        <p>Yes 🎁 PRIME VIRAL BONUS can only be claimed once per account. Once unlocked and claimed, it cannot be claimed again.</p>
+      </div>
+    </div>
+
+    <div class="refer-faq-item">
+      <button class="refer-faq-trigger">
+        <span>❓ When does my referral count increase?</span>
+        <i class="fas fa-chevron-down refer-faq-icon"></i>
+      </button>
+      <div class="refer-faq-body">
+        <p>Your friend must complete at least 3 daily check-ins ✅ After that your referral progress updates automatically 🚀</p>
+      </div>
+    </div>
+
+    <div class="refer-faq-item">
+      <button class="refer-faq-trigger">
+        <span>❓ How long does the 500 followers delivery take?</span>
+        <i class="fas fa-chevron-down refer-faq-icon"></i>
+      </button>
+      <div class="refer-faq-body">
+        <p>After verification, our team usually processes PRIME VIRAL BONUS requests within the promised delivery time 💙</p>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- end #page-refer -->
+
+  </div><!-- end app-container -->
+
+  <!-- ═══ BOTTOM NAVIGATION ═══ -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <button class="nav-item nav-sm" data-page="contact">
+   <img src="icons/email.png" class="nav-icon">
+      <span>Contact</span>
+    </button>
+    <button class="nav-item nav-md active" data-page="home">
+      <img src="icons/home.png" class="nav-icon">
+      <span>Home</span>
+    </button>
+   <button class="nav-item nav-order" data-page="order">
+  <div class="nav-order-circle">
+<img src="icons/insta.png" id="order-logo" class="nav-icon">
+
+  </div>
+  <span>ORDER</span>
+</button>
+    <button class="nav-item nav-md" data-page="wallet">
+      <img src="icons/wallet.png" class="nav-icon">
+      <span>Wallet</span>
+    </button>
+    <button class="nav-item nav-sm" data-page="more">
+
+     <img src="icons/more.png" class="nav-icon">
+      <span>More</span>
+    </button>
+  </nav>
+
+
+
+  <div class="modal-overlay" id="order-detail-modal">
+<div class="modal-content">
+  <div class="modal-box">
+
+    <h3>Order Details</h3>
+
+    <p>Credits Used:
+      <span id="detail-credit-used"></span>
+      <img src="icons/cashbag.png" style="height:18px;">
+    </p>
+
+    <p>Followers: <span id="detail-followers"></span></p>
+
+    <p>Order Date: <span id="detail-date"></span></p>
+
+    <p>Order Time: <span id="detail-time"></span></p>
+
+    <p>Status: <span id="detail-status"></span></p>
+
+    <button class="btn-primary btn-full mt-20"
+      onclick="document.getElementById('order-detail-modal').classList.remove('visible')">
+      Close
+    </button>
+
+  </div>
+</div>
+
+</div> <!-- modal-overlay -->
+
+
+<!-- PRIME AI Floating Button (Draggable) -->
+<div id="prime-ai-float-btn" class="prime-ai-float-btn">
+  <img src="ai.png" alt="Prime AI" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+</div>
+
+
+<script>
+  (function(){
+    emailjs.init("q7jXY0z5Uwry4IiZs");
+  })();
+</script>
+
+
+
+
+  <!-- ═══ JS MODULES ═══ -->
+  <script type="module" src="home.js"></script>
+  <script type="module" src="order.js"></script>
+  <script type="module" src="wallet.js"></script>
+  <script type="module" src="contact.js"></script>
+  <script type="module" src="more.js"></script>
+  <script type="module" src="dailycheckin.js"></script>
+  <script type="module" src="pay.js"></script>
+  
+
+
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+
+
+  <!-- MAIN APP SCRIPT -->
+  <script type="module" src="script.js"></script>
+
+</body>
+</html>

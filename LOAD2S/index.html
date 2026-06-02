@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prime-follower</title>
+    <style>
+        /*
+        ============================================================================
+        Prime-follower PREMIUM LOADER - CSS
+        ============================================================================
+        
+        DESIGN PHILOSOPHY:
+        ------------------
+        This loader is designed for a premium finance/wealth brand. Every element
+        communicates trust, luxury, and sophistication. The dark background creates
+        depth, while the gold accents evoke wealth and exclusivity.
+        
+        COLOR PALETTE & RATIONALE:
+        --------------------------
+        • Background (#070709): Deep charcoal with warm undertones - premium finance aesthetic
+          that doesn't feel aggressive or gaming-oriented.
+        • Gold Primary (#D4AF37): Classic 18k metallic gold - universally associated with 
+          wealth, trust, and premium quality.
+        • Gold Highlight (#E8C84A / #FFD86B): Warm bright gold for luminous accents.
+        • Text Gold (#E5C158): Slightly softer gold optimized for text legibility.
+        • Glow Effects: Subtle, diffused - no harsh neon. Creates depth without cheapening.
+        
+        MOTION DESIGN:
+        --------------
+        • Rotation uses custom cubic-bezier for smooth, decelerating feel (not linear/robotic)
+        • Pulse animation creates "breathing" effect - organic, trustworthy
+        • Letter animation: staggered fade-in with micro-upward motion
+        • All animations feel intentional and controlled, not chaotic
+        
+        LETTER TIMING CALCULATION:
+        --------------------------
+        Text: "Prime-follower" = 13 characters (including space)
+        Animating letters only (12 letters, space excluded from stagger count)
+        
+        • Total duration: 2000ms
+        • Start delay: 100ms (let ring establish first)
+        • Available animation window: 2000 - 100 = 1900ms
+        • Letter stagger: 1900 / 12 ≈ 158.33ms per letter
+        • Each letter fade: 200ms with ease-out curve
+        • Last letter starts at: 100 + (11 × 158.33) ≈ 1841ms
+        • Last letter completes at: 1841 + 200 ≈ 2041ms (slightly over, but imperceptible)
+        
+        EXIT BEHAVIOR:
+        --------------
+        At 2000ms, loader fades out gently (400ms) with slight scale-down.
+        No abrupt cuts - feels complete and polished.
+        
+        ============================================================================
+        */
+
+        /* ==================== CSS CUSTOM PROPERTIES ==================== */
+        :root {
+            /* Core Colors */
+            --bg-primary: #070709;
+            --bg-vignette: #0a0a0c;
+
+            /* Gold Palette */
+            --gold-base: #D4AF37;
+            --gold-bright: #E8C84A;
+            --gold-highlight: #FFD86B;
+            --gold-deep: #B8963A;
+            --gold-text: #E5C158;
+
+            /* Glow Effects (subtle, not harsh) */
+            --glow-soft: rgba(212, 175, 55, 0.15);
+            --glow-medium: rgba(212, 175, 55, 0.25);
+            --glow-strong: rgba(232, 200, 74, 0.35);
+
+            /* Ring Sizing */
+            --ring-size: clamp(80px, 15vmin, 160px);
+            --ring-stroke: 5;
+
+            /* Typography */
+            --font-size: clamp(18px, 3.5vmin, 32px);
+            --letter-spacing: 0.22em;
+
+            /* Animation Timings */
+            --loader-duration: 2000ms;
+            --letter-stagger: 158.33ms;
+            --letter-fade: 200ms;
+            --exit-duration: 400ms;
+
+            /* Easing Functions - Luxury Feel */
+            --ease-ring-rotate: cubic-bezier(0.4, 0.0, 0.2, 1);
+            --ease-ring-pulse: cubic-bezier(0.45, 0.05, 0.55, 0.95);
+            --ease-letter: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --ease-exit: cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        /* ==================== RESET & BASE ==================== */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            /* System font stack - clean, modern sans-serif */
+            font-family:
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                'Segoe UI',
+                'Helvetica Neue',
+                Arial,
+                sans-serif;
+            background-color: var(--bg-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ==================== LOADER CONTAINER ==================== */
+        .loader-container {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+
+            /* Layered premium background */
+            background:
+                /* Soft radial vignette - darker edges */
+                radial-gradient(ellipse 80% 60% at 50% 40%,
+                    rgba(18, 18, 22, 0.0) 0%,
+                    rgba(7, 7, 9, 0.6) 60%,
+                    var(--bg-primary) 100%),
+                /* Very subtle warm center glow */
+                radial-gradient(ellipse 50% 50% at 50% 45%,
+                    rgba(212, 175, 55, 0.03) 0%,
+                    transparent 70%),
+                var(--bg-primary);
+        }
+
+        /* Micro-noise texture overlay for depth */
+        .loader-container::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0.025;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+
+        /* Exit animation - smooth fade out */
+        .loader-container.exit {
+            animation: loaderExit var(--exit-duration) var(--ease-exit) forwards;
+        }
+
+        @keyframes loaderExit {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(0.97);
+                visibility: hidden;
+            }
+        }
+
+        /* ==================== RING WRAPPER ==================== */
+        .ring-wrapper {
+            position: relative;
+            width: var(--ring-size);
+            height: var(--ring-size);
+            /* Position slightly above center for visual balance with text below */
+            margin-top: -6vh;
+            margin-bottom: clamp(28px, 5vmin, 50px);
+        }
+
+        /* Outer soft glow aura */
+        .ring-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: -20%;
+            border-radius: 50%;
+            background: radial-gradient(circle at center,
+                    var(--glow-soft) 0%,
+                    transparent 65%);
+            pointer-events: none;
+            animation: glowPulse var(--loader-duration) var(--ease-ring-pulse) 1 forwards;
+        }
+
+        @keyframes glowPulse {
+            0% {
+                opacity: 0.6;
+                transform: scale(0.9);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+
+            100% {
+                opacity: 0.6;
+                transform: scale(0.9);
+            }
+        }
+
+        /* ==================== SVG RING ==================== */
+        .ring-svg {
+            width: 100%;
+            height: 100%;
+            will-change: transform;
+            overflow: visible;
+            /* Combined rotation and pulse animation */
+            animation:
+                ringRotate var(--loader-duration) var(--ease-ring-rotate) 1 forwards,
+                ringPulse var(--loader-duration) var(--ease-ring-pulse) 1 forwards;
+        }
+
+        /* Smooth rotation - decelerating, not linear */
+        @keyframes ringRotate {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Breathing pulse effect */
+        @keyframes ringPulse {
+            0% {
+                transform: rotate(0deg) scale(0.95);
+            }
+
+            25% {
+                transform: rotate(90deg) scale(1.02);
+            }
+
+            50% {
+                transform: rotate(180deg) scale(1.05);
+            }
+
+            75% {
+                transform: rotate(270deg) scale(1.02);
+            }
+
+            100% {
+                transform: rotate(360deg) scale(0.95);
+            }
+        }
+
+        /* Background track - subtle visibility */
+        .ring-track {
+            fill: none;
+            stroke: rgba(212, 175, 55, 0.08);
+            stroke-width: var(--ring-stroke);
+        }
+
+        /* Main gold ring */
+        .ring-main {
+            fill: none;
+            stroke: url(#goldGradient);
+            stroke-width: var(--ring-stroke);
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 6px var(--glow-soft));
+        }
+
+        /* Bright traveling arc - creates shimmer effect */
+        .ring-arc {
+            fill: none;
+            stroke: url(#arcGradient);
+            stroke-width: calc(var(--ring-stroke) + 1);
+            stroke-linecap: round;
+            /* 30% visible arc, 70% gap */
+            stroke-dasharray: 83 193;
+            /* Based on circumference 2πr ≈ 276 for r=44 */
+            animation: arcSweep var(--loader-duration) linear 1 forwards;
+            filter: drop-shadow(0 0 8px var(--glow-medium));
+        }
+
+        @keyframes arcSweep {
+            0% {
+                stroke-dashoffset: 276;
+            }
+
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* Inner accent ring - adds depth */
+        .ring-inner {
+            fill: none;
+            stroke: rgba(232, 200, 74, 0.15);
+            stroke-width: 1;
+        }
+
+        /* ==================== LOADER TEXT ==================== */
+        .loader-text {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0;
+            position: relative;
+            min-height: calc(var(--font-size) * 1.5);
+        }
+
+        .letter {
+            font-size: var(--font-size);
+            font-weight: 600;
+            letter-spacing: var(--letter-spacing);
+            color: var(--gold-text);
+            opacity: 0;
+            transform: translateY(12px);
+            display: inline-block;
+            will-change: opacity, transform;
+            /* Subtle text shadow for depth */
+            text-shadow:
+                0 0 20px var(--glow-soft),
+                0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Space between words */
+        .letter.space {
+            width: 0.35em;
+            opacity: 1;
+            transform: none;
+        }
+
+        /* Visible state with animation */
+        .letter.visible {
+            animation: letterReveal var(--letter-fade) var(--ease-letter) forwards;
+        }
+
+        @keyframes letterReveal {
+            0% {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ==================== REDUCED MOTION PREFERENCE ==================== */
+        @media (prefers-reduced-motion: reduce) {
+            .ring-svg {
+                animation: none !important;
+                transform: scale(1) rotate(0deg);
+            }
+
+            .ring-wrapper::before {
+                animation: none !important;
+                opacity: 0.8;
+            }
+
+            .ring-arc {
+                animation: none !important;
+                stroke-dasharray: 276 0;
+                stroke-dashoffset: 0;
+            }
+
+            .letter {
+                opacity: 1 !important;
+                transform: none !important;
+                animation: none !important;
+            }
+
+            .loader-container.exit {
+                animation: reducedExit var(--exit-duration) ease-out forwards;
+            }
+
+            @keyframes reducedExit {
+                0% {
+                    opacity: 1;
+                }
+
+                100% {
+                    opacity: 0;
+                    visibility: hidden;
+                }
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ==================== LOADER ONLY ==================== -->
+    <div class="loader-container" id="loader" role="progressbar" aria-label="Loading" aria-busy="true">
+
+        <!-- Rotating Ring -->
+        <div class="ring-wrapper">
+            <svg class="ring-svg" viewBox="0 0 100 100" aria-hidden="true">
+                <defs>
+                    <!-- Main ring metallic gold gradient -->
+                    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#D4AF37" />
+                        <stop offset="25%" stop-color="#E8C84A" />
+                        <stop offset="50%" stop-color="#D4AF37" />
+                        <stop offset="75%" stop-color="#B8963A" />
+                        <stop offset="100%" stop-color="#D4AF37" />
+                    </linearGradient>
+
+                    <!-- Bright arc gradient with transparent ends -->
+                    <linearGradient id="arcGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#FFD86B" stop-opacity="0" />
+                        <stop offset="15%" stop-color="#FFD86B" stop-opacity="0.6" />
+                        <stop offset="50%" stop-color="#FFEBB3" stop-opacity="1" />
+                        <stop offset="85%" stop-color="#FFD86B" stop-opacity="0.6" />
+                        <stop offset="100%" stop-color="#FFD86B" stop-opacity="0" />
+                    </linearGradient>
+                </defs>
+
+                <!-- Background track (subtle) -->
+                <circle class="ring-track" cx="50" cy="50" r="44" />
+
+                <!-- Inner accent ring -->
+                <circle class="ring-inner" cx="50" cy="50" r="38" />
+
+                <!-- Main gold ring -->
+                <circle class="ring-main" cx="50" cy="50" r="44" />
+
+                <!-- Bright traveling arc -->
+                <circle class="ring-arc" cx="50" cy="50" r="44" />
+            </svg>
+        </div>
+
+        <!-- Text: Prime-follower (letters injected by JavaScript) -->
+        <div class="loader-text" id="loaderText" aria-live="polite"></div>
+    </div>
+
+    <script>
+        /**
+         * ============================================================================
+         * Prime-follower LOADER - JavaScript Controller
+         * ============================================================================
+         * 
+         * This script handles:
+         * 1. Splitting "Prime-follower" into individual letter spans
+         * 2. Staggered letter-by-letter reveal animation
+         * 3. Precise timing synchronization with CSS ring animations
+         * 4. Graceful exit after exactly 2 seconds
+         * 5. Respecting reduced motion preferences
+         * 
+         * TIMING MATH:
+         * ------------
+         * • Text: "Prime-follower" = 13 characters (12 letters + 1 space)
+         * • Animatable letters: 12 (space is not animated, just preserves visual gap)
+         * • Start delay: 50ms (brief pause before first letter)
+         * • Total available time: 2000ms - 50ms = 1950ms
+         * • Stagger interval: 1950ms / 12 ≈ 162.5ms per letter
+         * • Each letter fade: 200ms with ease-out
+         * 
+         * SEQUENCE:
+         * ---------
+         * 0ms      : Page loads, ring animation starts (CSS)
+         * 50ms     : First letter "C" begins fade-in
+         * 212.5ms  : Letter "a" begins
+         * ...continues...
+         * 1837.5ms : Last letter "e" begins fade-in
+         * 2000ms   : Exit animation triggered
+         * 2400ms   : Loader completely hidden
+         * 
+         * ============================================================================
+         */
+
+        (function () {
+            'use strict';
+
+            // ==================== CONFIGURATION ====================
+            const CONFIG = {
+                text: 'PRIME-FOLLOWER',
+                loaderDuration: 2000,       // Total animation duration (ms)
+                startDelay: 50,             // Delay before first letter (ms)
+                letterFadeDuration: 200,    // Each letter's fade animation (ms)
+                exitDuration: 400           // Exit fade-out duration (ms)
+            };
+
+            // ==================== DOM REFERENCES ====================
+            const loader = document.getElementById('loader');
+            const textContainer = document.getElementById('loaderText');
+
+            // ==================== UTILITY: Check Reduced Motion ====================
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            // ==================== INITIALIZE LETTER ELEMENTS ====================
+            function createLetters() {
+                const chars = CONFIG.text.split('');
+                const fragment = document.createDocumentFragment();
+
+                chars.forEach((char) => {
+                    const span = document.createElement('span');
+
+                    if (char === ' ') {
+                        span.className = 'letter space';
+                        span.innerHTML = '&nbsp;';
+                    } else {
+                        span.className = 'letter';
+                        span.textContent = char;
+                    }
+
+                    span.setAttribute('aria-hidden', 'true');
+                    fragment.appendChild(span);
+                });
+
+                textContainer.appendChild(fragment);
+
+                // Set accessible label for screen readers
+                textContainer.setAttribute('aria-label', CONFIG.text);
+            }
+
+            // ==================== ANIMATE LETTERS ====================
+            function animateLetters() {
+                // Get only animatable letters (not spaces)
+                const letters = textContainer.querySelectorAll('.letter:not(.space)');
+                const letterCount = letters.length;
+
+                // Handle reduced motion - show all immediately
+                if (prefersReducedMotion) {
+                    letters.forEach(letter => {
+                        letter.style.opacity = '1';
+                        letter.style.transform = 'none';
+                    });
+                    return;
+                }
+
+                // Calculate stagger timing
+                // Available time = total duration - start delay
+                const availableTime = CONFIG.loaderDuration - CONFIG.startDelay;
+                const staggerInterval = availableTime / letterCount;
+
+                // Animate each letter with staggered delay
+                letters.forEach((letter, index) => {
+                    const delay = CONFIG.startDelay + (index * staggerInterval);
+
+                    setTimeout(() => {
+                        letter.classList.add('visible');
+                    }, delay);
+                });
+            }
+
+            // ==================== TRIGGER EXIT ====================
+            function triggerExit() {
+                setTimeout(() => {
+                    loader.classList.add('exit');
+
+                    // Hide loader after exit animation completes
+                    setTimeout(() => {
+                        loader.style.display = 'none';
+                        loader.setAttribute('aria-busy', 'false');
+                    }, CONFIG.exitDuration);
+
+                }, CONFIG.loaderDuration);
+            }
+
+            // ==================== INITIALIZE ====================
+            function init() {
+                createLetters();
+                animateLetters();
+                triggerExit();
+            }
+
+            // Start when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+
+        })();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,995 @@
+/* ===============================
+   mobile.css - Clean, single-file
+   - Gradient card
+   - Frosted inputs
+   - Left lock icon + optional left-eye placement
+   - Right-side email/user icons
+   - Google button, messages, switch button with 3D shadow
+   - No duplicate selectors, clear structure
+   =============================== */
+
+/* -------------------------------
+   Reset / Base
+   ------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: "Inter", "Poppins", Arial, sans-serif;
+  background: linear-gradient(180deg,#a18cd1 0%, #fbc2eb 55%, #fad0c4 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #222;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* -------------------------------
+   Outer wrappers
+   ------------------------------- */
+.auth-wrapper {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Card container (the rounded card you see) */
+.auth-box {
+  width: 94%;
+  max-width: 380px;
+  min-width: 300px;
+  border-radius: 24px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  color: #fff;
+  /* card gradient */
+  background: linear-gradient(180deg,#f17db0 0%, #5b6ef6 55%, #2b8df7 100%);
+  box-shadow: 0 18px 45px rgba(16,30,115,0.18);
+}
+
+/* -------------------------------
+   Header (logo + headings)
+   ------------------------------- */
+.auth-header {
+  background: transparent; /* gradient from card shows through */
+  padding: 18px 18px 12px;
+  text-align: center;
+  color: #fff;
+}
+
+.logo-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth-logo,
+.logo-box img {
+  width: 78px;
+  height: 78px;
+  max-width: 78px;
+  max-height: 78px;
+  object-fit: cover;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  display: block;
+  margin: 0 auto;
+}
+
+.app-name {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: rgba(255,255,255,0.95);
+  margin-bottom: 4px;
+}
+
+.welcome-big {
+  font-size: 28px;
+  line-height: 1.05;
+  font-weight: 800;
+  margin-bottom: 6px;
+  color: #fff;
+  text-shadow: 0 3px 10px rgba(0,0,0,0.12);
+}
+
+.small-text {
+  font-size: 13px;
+  color: rgba(255,255,255,0.92);
+  margin-bottom: 10px;
+}
+
+/* -------------------------------
+   Body area (form container)
+   ------------------------------- */
+.auth-body {
+  background: transparent;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Form base: use .active to show */
+.form {
+  display: none;
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.form.active {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* -------------------------------
+   Input group (single unified model)
+   - left icon(s) (lock/envelope/user) are placed at left
+   - optional right icon (icon-right) at right
+   - toggle-pass can be on right (default) OR left (with .left-eye)
+   ------------------------------- */
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 10px 0;
+  gap: 8px;
+  /* allow keyboard focus outlines inside if needed */
+}
+
+/* Shared input styles */
+.input-group input {
+  width: 100%;
+  padding: 12px 44px 12px 44px; /* default: space both sides for icons */
+  border-radius: 12px;
+  border: none;
+  background: rgba(255,255,255,0.92);
+  font-size: 15px;
+  color: #222;
+  outline: none;
+  box-shadow: 0 6px 18px rgba(16,30,115,0.06);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Focus ring for accessibility */
+.input-group input:focus {
+  box-shadow: 0 6px 28px rgba(16,30,115,0.10), 0 0 0 4px rgba(94,114,255,0.06);
+}
+
+/* Icon base for absolute-positioned icons */
+.input-group .icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7687;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+/* email/user icon on the right variant (if used) */
+.input-group .icon-right {
+  position: absolute;
+  right: 12px;
+  left: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7687;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ---------- Make lock icon aligned like email/user icons (on the right) ---------- */
+/* Put lock icon at same right offset as .icon-right */
+.lock-icon {
+  position: absolute;     /* keep absolute positioning */
+  right: 12px;            /* same as .icon-right */
+  left: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7687;
+  font-size: 16px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Place the eye slightly left of the lock with a small gap (approx 4px) */
+/* adjust "36px" if you need a pixel-perfect gap for your icon font */
+.toggle-pass {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 36px;        /* eye sits left of the lock (12px + ~20px icon width + 4px gap ≈ 36px) */
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: none;      /* JS toggles .visible */
+  padding: 6px;
+  font-size: 16px;
+  color: #4e73ff;
+  z-index: 3;
+}
+
+/* When JS adds .visible it shows the eye */
+.toggle-pass.visible { display: inline-flex; }
+
+/* Ensure inputs leave enough right padding for both icons */
+.input-group input {
+  /* keep other values; override right padding so text never collides with icons */
+  padding-right: 72px; /* enough space for eye + gap + lock; adjust (56-84) if needed */
+}
+
+/* If you have variant classes for left/right icons keep them:
+   this makes sure email/user icon rules still work */
+.icon-right {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7687;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+
+/* Right-side eye (default placement) */
+.toggle-pass.right {
+  right: 12px;
+}
+
+/* Left-side eye option: sits to the right of the left icon with 4px gap.
+   Use markup: <button class="toggle-pass left-eye">...</button>
+   or JS can add .left-eye to the toggle when you want it on left. */
+:root {
+  --icon-size: 16px; /* used to compute left-eye position */
+  --left-icon-offset: 12px;
+  --left-eye-gap: 4px;
+}
+
+/* left-eye absolute left position computed from variables:
+   left = left icon offset (12px) + icon-size (16px) + gap (4px) = 32px */
+.toggle-pass.left-eye {
+  left: calc(var(--left-icon-offset) + var(--icon-size) + var(--left-eye-gap));
+  right: auto;
+}
+
+/* When eye is right and icon-right exists, eye should be on top (z-index) */
+.toggle-pass.right { z-index: 4; }
+
+/* Active visual feedback */
+.toggle-pass:active { transform: translateY(-50%) scale(0.96); }
+
+/* -------------------------------
+   Ensure padding for icons (consistent)
+   - If left-eye used, reduce left padding a bit so text doesn't collide
+   - If icon-right used, padding-right must be large enough
+   ------------------------------- */
+
+/* Default padding (both sides) already handled above.
+   Provide helper classes for special cases if needed. */
+
+.input-has-left-icon input {
+  padding-left: calc(var(--left-icon-offset) + var(--icon-size) + 12px); /* left offset + icon size + comfortable gap */
+}
+
+.input-has-right-icon input {
+  padding-right: 44px;
+}
+
+/* If left-eye (eye sitting left next to lock) is used, we need slightly larger left padding */
+.input-has-left-eye input {
+  padding-left: calc(var(--left-icon-offset) + var(--icon-size) + var(--left-eye-gap) + 18px);
+}
+
+/* -------------------------------
+   Links & small text
+   ------------------------------- */
+.forgot-link {
+  display: inline-block;
+  width: 100%;
+  text-align: left;
+  font-size: 13px;
+  color: rgba(255,255,255,0.95);
+  margin: 8px 0 6px;
+  text-decoration: none;
+}
+
+/* -------------------------------
+   Buttons
+   ------------------------------- */
+.btn {
+  border: none;
+  cursor: pointer;
+  border-radius: 28px;
+  font-weight: 600;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* primary action: login / register */
+.action-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 14px;
+  font-size: 16px;
+  margin-top: 6px;
+  background: linear-gradient(90deg,#ff6b81,#ff4466);
+  color: white;
+  box-shadow: 0 8px 20px rgba(255,68,102,0.18);
+  border: none;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.action-btn:active { transform: translateY(2px) scale(0.997); }
+
+/* Google button: white card with logo */
+.google-btn {
+  margin-top: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1.5px solid rgb(190, 190, 190);
+  color: #000;
+  padding: 10px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+.google-btn img { width: 20px; height: 20px; display: inline-block; }
+
+/* -------------------------------
+   Switch (Register/Login) : 3D shadow button
+   ------------------------------- */
+.switch-box {
+  text-align: center;
+  margin-top: 16px;
+}
+
+#switch-btn,
+.switch-btn {
+  background: linear-gradient(135deg, #4CAF50, #119818);
+  color: white;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.02rem;
+  cursor: pointer;
+  box-shadow: 0 6px rgba(27,94,32,1);
+  transition: all 0.18s ease;
+  display: inline-block;
+}
+
+#switch-btn:hover,
+.switch-btn:hover {
+  background: linear-gradient(135deg, #66BB6A, #388E3C);
+}
+
+#switch-btn:active,
+.switch-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 10px rgba(4,101,23,1);
+}
+
+/* -------------------------------
+   Messages placeholders (shown by JS)
+   ------------------------------- */
+.form-msg {
+  display: none;
+  font-size: 13px;
+  margin-top: 8px;
+  text-align: center;
+  line-height: 1.3;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+/* success / error visual */
+.form-msg.success {
+  display: block;
+  color: #0a7b28;
+  background: rgba(9,150,0,0.06);
+  border: 1px solid rgba(9,150,0,0.09);
+}
+
+.form-msg.error {
+  display: block;
+  color: #c92b2b;
+  background: rgba(255,240,240,0.06);
+  border: 1px solid rgba(201,43,43,0.08);
+}
+
+/* -------------------------------
+   Footer / tiny helpers
+   ------------------------------- */
+.footer-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.95);
+  margin-top: 6px;
+}
+
+/* Hide browser's built-in password reveal button and autofill decorations */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input[type="password"]::-webkit-contacts-auto-fill-button,
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-clear-button,
+input[type="password"]::-webkit-inner-spin-button,
+input[type="password"]::-webkit-calendar-picker-indicator,
+input[type="password"]::-webkit-textfield-decoration-container {
+  display: none !important;
+}
+
+/* -------------------------------
+   Responsiveness
+   ------------------------------- */
+@media (max-width: 420px) {
+  .auth-box {
+    width: 96%;
+    max-width: 380px;
+    border-radius: 20px;
+  }
+  .welcome-big { font-size: 24px; }
+  .auth-logo { width: 64px; height: 64px; border-radius: 14px; }
+  .input-group input { font-size: 14px; padding: 12px 44px 12px 44px; }
+  .action-btn { font-size: 15px; padding: 12px; }
+}
+
+/* Desktop safety: keep layout usable on wide screens */
+@media (min-width: 900px) {
+  .auth-wrapper { padding-top: 40px; padding-bottom: 40px; }
+  .auth-box { max-width: 420px; }
+}
+
+/* -------------------------------
+   Accessibility tweaks
+   - visible focus outlines
+   - larger hit areas for touch
+   ------------------------------- */
+button:focus,
+a:focus,
+input:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(94,114,255,0.06);
+  border-radius: 8px;
+}
+
+/* enlarge tappable areas for icon buttons */
+.toggle-pass,
+.google-btn,
+.action-btn,
+#switch-btn,
+.switch-btn {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* -------------------------------
+   UX helpers / small utility classes
+   ------------------------------- */
+
+/* Show element (utility) */
+.u-show { display: block !important; }
+
+/* Inline hint text inside forms */
+.hint {
+  font-size: 12px;
+  color: rgba(255,255,255,0.85);
+  text-align: center;
+  margin-top: 6px;
+}
+
+/* Divider helper for "or" row between buttons */
+.hr-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0;
+}
+.hr-row::before,
+.hr-row::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.06);
+}
+
+/* -------------------------------
+   Example class combos to set in HTML/JS
+   These are not mandatory but useful:
+   - Add .input-has-left-icon on .input-group when left icon present
+   - Add .input-has-left-eye on .input-group when left-eye used
+   - Use toggle-pass.right or toggle-pass.left-eye to control eye placement
+   ------------------------------- */
+
+/* -------------------------------
+   Long comments below to keep file verbose and easy to scan
+   The comments are intentional and do not duplicate rules.
+   They explain placement choices and usage examples.
+
+   Usage examples (HTML snippets):
+
+   1) Typical email input with right icon:
+      <div class="input-group input-has-right-icon">
+        <input type="email" id="login-email" ... />
+        <i class="fas fa-envelope icon-right"></i>
+      </div>
+
+   2) Password input with right eye (common):
+      <div class="input-group input-has-right-icon">
+        <input type="password" id="login-password" ... />
+        <i class="fas fa-lock lock-icon icon"></i>
+        <button type="button" class="toggle-pass right"><i class="fas fa-eye"></i></button>
+      </div>
+
+   3) Password input with left lock and eye immediately to the right of lock:
+      <div class="input-group input-has-left-icon input-has-left-eye">
+        <i class="fas fa-lock lock-icon icon"></i>
+        <button type="button" class="toggle-pass left-eye"><i class="fas fa-eye"></i></button>
+        <input type="password" id="register-password" ... />
+      </div>
+
+   Note: JS should add/remove class "visible" to .toggle-pass when input has content
+         (your JS already handles that).
+
+  /* For all input fields with left-side icons */
+.input-group input {
+  padding-left: 12px;   /* 👈 just 5px space before text */
+  padding-right: 72px; /* keep enough room for lock + eye icons on the right */
+}
+
+
+
+
+
+
+
+
+
+/* ---------- Desktop / Laptop full-screen warning ---------- */
+.pc-warning {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, rgba(2,6,23,0.85), rgba(2,6,23,0.95));
+  z-index: 9999;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  padding: 24px;
+}
+
+.pc-warning-card {
+  max-width: 520px;
+  width: 100%;
+  background: linear-gradient(180deg,#fff,#f7f7fb);
+  color: #111;
+  text-align: center;
+  padding: 28px;
+  border-radius: 16px;
+  box-shadow: 0 30px 80px rgba(2,6,23,0.55);
+  transform: translateY(0);
+}
+
+.pc-warning-card h1 {
+  font-size: 20px;
+  margin-bottom: 8px;
+  color: #e04b4b;
+  font-weight: 800;
+}
+
+.pc-warning-card p {
+  font-size: 14px;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+/* re-use .btn styles (override for visibility) */
+#pc-warning-close {
+  background: linear-gradient(135deg,#4CAF50,#119818);
+  color: white;
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+}
+
+/* When overlay shown, prevent body scroll */
+.pc-warning-open { overflow: hidden !important; height: 100vh !important; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ===============================
+   PUZZLE LOADER ANIMATION STYLES
+   =============================== */
+
+#puzzle-loader-overlay {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, #0a2a43 0%, #0a2a43 100%);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+}
+
+.puzzle-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  max-width: 780px;
+}
+
+.puzzle-box {
+  position: relative;
+  overflow: hidden;
+  background: #0a2a43;
+  border-radius: 15%;
+  border: 2px solid rgba(81,81,81,0.95);
+  transition: transform 700ms cubic-bezier(.22,.9,.2,1);
+  box-sizing: content-box;
+  will-change: transform;
+  width: 420px;
+  height: 420px;
+}
+
+@media (max-width: 1024px) {
+  .puzzle-box { width: 380px; height: 380px; }
+}
+
+@media (max-width: 700px) {
+  .puzzle-box { width: 300px; height: 300px; }
+}
+
+.puzzle-shadow {
+  filter: drop-shadow(0 18px 36px rgba(2,8,20,0.6));
+}
+
+.puzzle-tile {
+  position: absolute;
+  width: calc(100% / 3 + 1px);
+  height: calc(100% / 3 + 1px);
+  background-image: url("cash.jpg");
+  background-size: 300.5% 300.5%;
+  background-repeat: no-repeat;
+  transform-origin: center center;
+  transition: transform 900ms cubic-bezier(.34,1.56,.64,1);
+  will-change: transform;
+}
+
+.puzzle-tile[data-index="8"] {
+  clip-path: polygon(0 0, 100% 0, 100% 75%, 75% 100%, 0 100%);
+  -webkit-clip-path: polygon(0 0, 100% 0, 100% 75%, 75% 100%, 0 100%);
+}
+
+.puzzle-box::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: calc(100% / 3);
+  height: calc(100% / 3);
+  background-image: url("cash.jpg");
+  background-size: 300.5% 300.5%;
+  background-position: 100% 100%;
+  pointer-events: none;
+  clip-path: polygon(75% 100%, 100% 75%, 100% 100%);
+  -webkit-clip-path: polygon(75% 100%, 100% 75%, 100% 100%);
+}
+
+.puzzle-message-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: min(540px, 90vw);
+  pointer-events: none;
+}
+
+.puzzle-message {
+  color: #00ff11;
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 1.05;
+  text-align: center;
+  white-space: normal;
+  opacity: 0;
+  transition: opacity 260ms ease;
+  display: block;
+  min-height: 3.2rem;
+}
+
+@media (max-width: 1024px) { .puzzle-message { font-size: 28px; } }
+@media (max-width: 700px) { .puzzle-message { font-size: 20px; } }
+
+.puzzle-line {
+  display: block;
+  margin: 4px 0;
+  min-height: 1.1em;
+}
+
+.puzzle-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: #00ff11;
+  margin-left: 6px;
+  vertical-align: text-bottom;
+  animation: blink-cursor 700ms steps(1) infinite;
+}
+
+@keyframes blink-cursor {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.puzzle-dots {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  opacity: 0;
+  transition: opacity 180ms ease;
+  pointer-events: none;
+}
+
+.puzzle-dots.show { opacity: 1; }
+
+.puzzle-dots span {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #00ff11;
+  transform: scale(1);
+  opacity: 0.9;
+  border: solid black 1px;
+}
+
+@keyframes dotPulse {
+  0% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.7); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.6; }
+}
+
+.puzzle-dots.show span:nth-child(1) {
+  animation: dotPulse 900ms ease-in-out infinite 0ms;
+}
+
+.puzzle-dots.show span:nth-child(2) {
+  animation: dotPulse 900ms ease-in-out infinite 240ms;
+}
+
+.puzzle-dots.show span:nth-child(3) {
+  animation: dotPulse 900ms ease-in-out infinite 480ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .puzzle-tile, .puzzle-box {
+    transition: none !important;
+    animation: none !important;
+  }
+  .puzzle-cursor, .puzzle-dots span {
+    animation: none !important;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+/* Add this to your mobile.css file - replace the existing .google-btn rule */
+
+/* Google button: white card with logo */
+.google-btn {
+  margin-top: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1.5px solid rgb(190, 190, 190);
+  color: #000;
+  padding: 10px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  cursor: pointer; /* 👈 Added this */
+  transition: transform 0.12s ease, box-shadow 0.12s ease; /* 👈 Added this */
+}
+
+.google-btn:hover {
+  box-shadow: 0 8px 22px rgba(0,0,0,0.16);
+  transform: translateY(-1px);
+}
+
+.google-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.10);
+}
+
+.google-btn img { 
+  width: 20px; 
+  height: 20px; 
+  display: inline-block; 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ===============================
+   INPUT VALIDATION STYLES
+   Add these to the BOTTOM of your mobile.css
+   =============================== */
+
+/* Valid input indicator (green checkmark) */
+.input-group.valid input {
+  border: 2px solid #00cc66 !important;
+  background: rgba(0, 204, 102, 0.05);
+}
+
+.input-group.valid::after {
+  content: "✓";
+  position: absolute;
+  right: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #00cc66;
+  font-size: 20px;
+  font-weight: bold;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Invalid input indicator (red X) */
+.input-group.invalid input {
+  border: 2px solid #ff4444 !important;
+  background: rgba(255, 68, 68, 0.05);
+}
+
+.input-group.invalid::after {
+  content: "✗";
+  position: absolute;
+  right: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ff4444;
+  font-size: 20px;
+  font-weight: bold;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Password Strength Bar */
+.password-strength-bar {
+  width: 100%;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  display: none;
+  position: relative; /* Changed from default */
+}
+
+.strength-bar-fill {
+  height: 5px;
+  width: 0%;
+  background: #ff4444;
+  border-radius: 4px;
+  transition: width 0.3s ease, background 0.3s ease;
+  margin-bottom: 6px;
+}
+
+.strength-text {
+  font-size: 13px;
+  margin-top: 6px;
+  color: #ff4444;
+  font-weight: 600;
+  text-align: left;
+  display: block;
+  width: 100%;
+  padding: 4px 0;
+}
+
+/* Smooth transitions for validation states */
+.input-group input {
+  transition: border 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Validation for password fields (adjust spacing for icons) */
+.input-group.valid input[type="password"],
+.input-group.invalid input[type="password"] {
+  padding-right: 90px !important; /* Extra space for checkmark/X + eye + lock */
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 420px) {
+  .input-group.valid::after,
+  .input-group.invalid::after {
+    right: 45px;
+    font-size: 18px;
+  }
+  
+  .strength-text {
+    font-size: 11px;
+  }
+}

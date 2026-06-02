@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Prime Follower</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap');
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: 'Poppins', sans-serif;
+    background: #000;
+  }
+
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+  }
+
+  /* MAIN CANVAS */
+  .canvas {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    min-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* BACKGROUND */
+  .bg {
+    position: fixed;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    height: 100%;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse at 80% 10%, rgba(0,80,200,0.38) 0%, transparent 55%),
+      radial-gradient(ellipse at 20% 80%, rgba(0,50,160,0.32) 0%, transparent 55%),
+      radial-gradient(ellipse at 50% 50%, rgba(0,20,80,0.6) 0%, transparent 80%),
+      linear-gradient(160deg, #000005 0%, #020a1a 40%, #030d22 70%, #000 100%);
+  }
+
+  /* Diagonal glow streaks */
+  .bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(135deg, transparent 30%, rgba(0,120,255,0.18) 45%, transparent 55%),
+      linear-gradient(135deg, transparent 55%, rgba(0,80,200,0.12) 68%, transparent 76%),
+      linear-gradient(225deg, transparent 25%, rgba(0,100,220,0.15) 40%, transparent 52%);
+    pointer-events: none;
+  }
+
+  .bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(135deg, transparent 15%, rgba(30,140,255,0.08) 35%, transparent 45%),
+      linear-gradient(225deg, transparent 60%, rgba(20,100,255,0.10) 75%, transparent 85%);
+    animation: bgShimmer 6s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+
+  /* Animated streak overlays */
+  .streak {
+    position: fixed;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .streak::before {
+    content: '';
+    position: absolute;
+    width: 3px;
+    height: 60%;
+    background: linear-gradient(180deg, transparent, rgba(0,150,255,0.6), rgba(0,100,255,0.3), transparent);
+    top: -10%;
+    left: 80%;
+    transform: rotate(35deg);
+    transform-origin: top center;
+    filter: blur(1px);
+    animation: streakMove 8s ease-in-out infinite alternate;
+  }
+
+  .streak::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 50%;
+    background: linear-gradient(180deg, transparent, rgba(0,120,255,0.5), transparent);
+    top: 20%;
+    left: 10%;
+    transform: rotate(-35deg);
+    transform-origin: top center;
+    filter: blur(1px);
+    animation: streakMove2 10s ease-in-out infinite alternate;
+  }
+
+  @keyframes streakMove {
+    0% { opacity: 0.6; left: 75%; }
+    100% { opacity: 1; left: 82%; }
+  }
+
+  @keyframes streakMove2 {
+    0% { opacity: 0.4; left: 8%; }
+    100% { opacity: 0.8; left: 14%; }
+  }
+
+  @keyframes bgShimmer {
+    0% { opacity: 0.7; }
+    100% { opacity: 1; }
+  }
+
+  /* CONTENT */
+  .content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 24px 40px;
+    gap: 0;
+  }
+
+  /* LOGO SECTION */
+  .logo-wrap {
+    position: relative;
+    width: 148px;
+    height: 148px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    animation: floatLogo 4s ease-in-out infinite;
+  }
+
+  @keyframes floatLogo {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  /* Gold circular ring */
+  .logo-ring {
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    background: linear-gradient(135deg, #ffd700, #ffb700, #fff6b0, #ffd700) border-box;
+    -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: destination-out;
+    mask-composite: exclude;
+    box-shadow:
+      0 0 20px rgba(255,215,0,0.7),
+      0 0 40px rgba(255,180,0,0.4),
+      0 0 60px rgba(255,150,0,0.2),
+      inset 0 0 15px rgba(255,215,0,0.1);
+    animation: goldPulse 3s ease-in-out infinite;
+  }
+
+  @keyframes goldPulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(255,215,0,0.7), 0 0 40px rgba(255,180,0,0.4), 0 0 60px rgba(255,150,0,0.2); }
+    50% { box-shadow: 0 0 30px rgba(255,215,0,0.9), 0 0 60px rgba(255,180,0,0.6), 0 0 90px rgba(255,150,0,0.35); }
+  }
+
+  .logo-img {
+    width: 128px;
+    height: 128px;
+    border-radius: 32px;
+    object-fit: cover;
+    display: block;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  }
+
+  /* Glassmorphism shine on logo */
+  .logo-shine {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 60%;
+    height: 40%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.35) 0%, transparent 100%);
+    border-radius: 24px 24px 40px 4px;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .logo-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.8);
+    margin-bottom: 0;
+    letter-spacing: 0.02em;
+    text-align: center;
+  }
+
+  /* APP TITLE */
+  .app-title {
+    font-size: clamp(42px, 11vw, 56px);
+    font-weight: 900;
+    text-align: center;
+    line-height: 1.05;
+    margin-top: 10px;
+    margin-bottom: 8px;
+    background: linear-gradient(180deg, #fff6b0 0%, #ffd700 35%, #ffb700 65%, #fff3a0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 16px rgba(255,200,0,0.7)) drop-shadow(0 4px 8px rgba(0,0,0,0.8));
+    position: relative;
+    -webkit-text-stroke: 0.5px rgba(255,215,0,0.3);
+    animation: goldShine 4s ease-in-out infinite;
+    letter-spacing: -0.01em;
+  }
+
+  @keyframes goldShine {
+    0%, 100% { filter: drop-shadow(0 0 16px rgba(255,200,0,0.7)) drop-shadow(0 4px 8px rgba(0,0,0,0.8)); }
+    50% { filter: drop-shadow(0 0 28px rgba(255,215,0,1)) drop-shadow(0 4px 12px rgba(0,0,0,0.9)); }
+  }
+
+  /* Gold underline glow */
+  .title-underline {
+    width: 70%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #ffd700, #ffb700, transparent);
+    border-radius: 2px;
+    margin: 4px auto 12px;
+    box-shadow: 0 0 12px rgba(255,215,0,0.8), 0 0 24px rgba(255,180,0,0.4);
+  }
+
+  /* SAFE TEXT */
+  .safe-text {
+    font-size: clamp(36px, 9.5vw, 52px);
+    font-weight: 900;
+    color: #fff;
+    text-align: center;
+    line-height: 1.05;
+    margin-bottom: 18px;
+    text-shadow:
+      0 0 20px rgba(100,180,255,0.9),
+      0 0 40px rgba(60,140,255,0.6),
+      0 2px 0 rgba(0,0,0,0.5),
+      0 0 60px rgba(30,100,255,0.3);
+    letter-spacing: -0.02em;
+  }
+
+  /* DESCRIPTION */
+  .desc {
+    font-size: clamp(15px, 3.8vw, 19px);
+    color: rgba(255,255,255,0.92);
+    text-align: center;
+    line-height: 1.55;
+    max-width: 380px;
+    margin-bottom: 28px;
+    font-weight: 400;
+  }
+
+  /* FEATURE ROWS */
+  .features {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+
+  .feature-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 0 20px;
+    height: 72px;
+    border-radius: 20px;
+    background: rgba(10,30,80,0.45);
+    border: 1px solid rgba(40,120,255,0.35);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow:
+      0 0 0 1px rgba(60,140,255,0.1),
+      0 4px 24px rgba(0,0,30,0.4),
+      inset 0 1px 0 rgba(255,255,255,0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: default;
+  }
+
+  .feature-row:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow:
+      0 0 0 1px rgba(60,140,255,0.3),
+      0 8px 32px rgba(0,0,60,0.5),
+      inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+
+.feature-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+  position: relative;
+  animation: iconPulse 3s ease-in-out infinite;
+}
+
+.feature-img{
+  width:30px;
+  height:30px;
+  object-fit:contain;
+
+  filter:
+    drop-shadow(0 0 6px rgba(0,180,255,0.9))
+    drop-shadow(0 0 12px rgba(0,120,255,0.6));
+}
+  .feature-icon.gold {
+    background: radial-gradient(circle, rgba(255,200,0,0.2), rgba(255,150,0,0.05));
+    border: 2px solid rgba(255,215,0,0.6);
+    box-shadow: 0 0 14px rgba(255,200,0,0.5), 0 0 28px rgba(255,150,0,0.2);
+  }
+
+  .feature-icon.blue {
+    background: radial-gradient(circle, rgba(40,120,255,0.25), rgba(0,80,200,0.05));
+    border: 2px solid rgba(60,160,255,0.7);
+    box-shadow: 0 0 14px rgba(40,140,255,0.6), 0 0 28px rgba(0,100,255,0.2);
+  }
+
+  @keyframes iconPulse {
+    0%, 100% { box-shadow: inherit; }
+    50% { filter: brightness(1.2); }
+  }
+
+  .feature-text {
+    font-size: clamp(18px, 4.5vw, 22px);
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.01em;
+  }
+
+  /* BOTTOM STAT */
+  .stat-text {
+    font-size: clamp(13px, 3.2vw, 16px);
+    color: #ffd700;
+    text-align: center;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    margin-bottom: 6px;
+    text-shadow: 0 0 12px rgba(255,200,0,0.6);
+  }
+
+  /* Shield icon divider */
+  .shield-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,200,0,0.5), transparent);
+  }
+
+  .shield-icon {
+    font-size: 24px;
+    filter: drop-shadow(0 0 8px rgba(255,200,0,0.7));
+  }
+
+  /* DOWNLOAD BUTTON */
+  .btn-wrap {
+    width: 100%;
+    max-width: 420px;
+    margin-bottom: 18px;
+  }
+
+  .dl-btn {
+    width: 100%;
+    height: 80px;
+    border-radius: 24px;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #5ddd00 0%, #39FF14 45%, #00C853 100%);
+    box-shadow:
+      0 0 0 2px rgba(80,255,50,0.4),
+      0 0 24px rgba(57,255,20,0.6),
+      0 0 48px rgba(57,255,20,0.3),
+      0 0 80px rgba(0,200,80,0.2),
+      0 8px 32px rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    animation: btnGlow 3s ease-in-out infinite;
+  }
+
+  @keyframes btnGlow {
+    0%, 100% {
+      box-shadow:
+        0 0 0 2px rgba(80,255,50,0.4),
+        0 0 24px rgba(57,255,20,0.6),
+        0 0 48px rgba(57,255,20,0.3),
+        0 0 80px rgba(0,200,80,0.2),
+        0 8px 32px rgba(0,0,0,0.6);
+    }
+    50% {
+      box-shadow:
+        0 0 0 3px rgba(100,255,80,0.6),
+        0 0 36px rgba(57,255,20,0.9),
+        0 0 70px rgba(57,255,20,0.5),
+        0 0 110px rgba(0,200,80,0.3),
+        0 8px 40px rgba(0,0,0,0.7);
+    }
+  }
+
+  .dl-btn:hover {
+    transform: scale(1.02) translateY(-2px);
+  }
+
+  .dl-btn:active {
+    transform: scale(0.98);
+  }
+
+  /* Button shine sweep */
+  .dl-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    transform: skewX(-15deg);
+    animation: btnShine 3s ease-in-out infinite;
+  }
+
+  @keyframes btnShine {
+    0% { left: -100%; }
+    40%, 100% { left: 150%; }
+  }
+
+  /* Inner neon border */
+  .dl-btn::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.25);
+    pointer-events: none;
+  }
+
+  /* Glass reflection top half */
+  .btn-glass {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%);
+    border-radius: 24px 24px 0 0;
+    pointer-events: none;
+  }
+
+  .btn-icon {
+    font-size: 32px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+    position: relative;
+    z-index: 1;
+  }
+
+  .btn-text {
+    font-size: clamp(24px, 6vw, 32px);
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: 0.04em;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 20px rgba(255,255,255,0.2);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* BOTTOM TEXT */
+  .bottom-text {
+    font-size: clamp(10px, 2.5vw, 12px);
+    color: rgba(255,255,255,0.75);
+    text-align: center;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 500;
+    padding-bottom: 24px;
+  }
+
+  /* Responsive for very small screens */
+  @media (max-width: 360px) {
+    .content { padding: 36px 18px 32px; }
+    .logo-wrap { width: 124px; height: 124px; }
+    .logo-img { width: 108px; height: 108px; }
+    .feature-row { height: 62px; gap: 14px; }
+    .dl-btn { height: 70px; }
+  }
+
+
+
+  
+</style>
+</head>
+<body>
+
+<div class="canvas">
+  <!-- Background layers -->
+  <div class="bg"></div>
+  <div class="streak"></div>
+
+  <!-- Main content -->
+  <div class="content">
+
+    <!-- LOGO -->
+    <div class="logo-wrap">
+      <div class="logo-ring"></div>
+      <img class="logo-img" src="insta.jpeg" alt="Instagram" onerror="this.style.background='linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)';this.style.borderRadius='32px'">
+      <div class="logo-shine"></div>
+    </div>
+
+   
+
+    <!-- APP TITLE -->
+    <div class="app-title">Prime Follower</div>
+    <div class="title-underline"></div>
+
+    <!-- SAFE TEXT -->
+    <div class="safe-text">Safe &amp; Secure</div>
+
+    <!-- DESCRIPTION -->
+    <p class="desc">We designed Prime Follower with privacy-first technology to keep your data protected while you grow your social presence.</p>
+
+    <!-- FEATURES -->
+    <div class="features">
+      <div class="feature-row">
+        <div class="feature-icon gold">🔐</div>
+        <span class="feature-text">Secure connection</span>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon blue">⚡</div>
+        <span class="feature-text">Fast performance</span>
+      </div>
+      <div class="feature-row">
+       <div class="feature-icon blue">
+  <img src="privacy.png" alt="Privacy" class="feature-img">
+</div>
+        <span class="feature-text">Privacy focused</span>
+      </div>
+    </div>
+
+    <!-- STAT -->
+    <div class="stat-text">Millions of actions processed safely every day.</div>
+
+    <!-- Shield divider -->
+    <div class="shield-divider">
+      <div class="divider-line"></div>
+      <div class="shield-icon">🛡️</div>
+      <div class="divider-line"></div>
+    </div>
+
+    <!-- DOWNLOAD BUTTON -->
+    <div class="btn-wrap">
+     <button class="dl-btn" id="download-btn">
+        <div class="btn-glass"></div>
+       <img src="download.png" alt="Download" class="download-img">
+        <span class="btn-text">DOWNLOAD NOW</span>
+      </button>
+    </div>
+
+    <!-- BOTTOM TEXT -->
+    <div class="bottom-text">Download Prime Follower to Continue</div>
+
+  </div>
+</div>
+
+<script>
+  // Smooth button feedback
+  const btn = document.querySelector('.dl-btn');
+
+  
+  if (btn) {
+    btn.addEventListener('touchstart', () => btn.style.transform = 'scale(0.97)');
+    btn.addEventListener('touchend', () => btn.style.transform = '');
+  }
+</script>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const ref = params.get("ref");
+if (ref) localStorage.setItem("primeReferralCode", ref);
+
+document
+  .getElementById("download-btn")
+  .addEventListener("click", () => {
+
+  let apkUrl =
+  "https://github.com/primefollower/Free-Followers-/releases/download/v1.1/PRIME-FOLLOWER.zip";
+
+    if (ref) {
+      apkUrl += `?ref=${encodeURIComponent(ref)}`;
+    }
+
+    window.location.href = apkUrl;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prime-follower Auth</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+</head>
+<body>
+
+<!-- Desktop / Laptop warning overlay -->
+<div id="pc-warning" aria-hidden="true" class="pc-warning" role="alert" style="display:none;">
+  <div class="pc-warning-card" role="document">
+    <h1>This app is not for your device</h1>
+    <p>Please open this on a mobile phone for best experience.</p>
+    <button id="pc-warning-go-back" class="btn">Go Back</button>
+    <p id="pc-warning-note" style="display:none; margin-top:10px; font-size:13px; color:#444;"></p>
+  </div>
+</div>
+
+<div class="auth-box">
+  
+  <!-- Logo + Title -->
+  <div class="auth-header">
+    <img src="cash.jpg" alt="Cash Treasure Logo" class="auth-logo"/>
+    <div class="app-name">PRIME-FOLLOWER</div>
+    <h2 class="welcome-big">Hello, Welcome!</h2>
+    <p class="small-text">Please login or register to continue</p>
+  </div>
+
+  <!-- Body -->
+  <div class="auth-body">
+    
+    <!-- Login Form -->
+    <form id="login-form" class="form active">
+      <div class="input-group">
+        <input type="email" id="login-email" placeholder="Email" required />
+        <i class="fas fa-envelope icon-right"></i>
+      </div>
+
+      <!-- Password field (Login) -->
+      <div class="input-group">
+        <i class="fas fa-lock lock-icon"></i>
+        <input type="password" id="login-password" placeholder="Password" required />
+        <button type="button" class="toggle-pass" aria-label="Show password">
+          <i class="fas fa-eye"></i>
+        </button>
+      </div>
+
+      <p id="login-msg" class="form-msg"></p>
+
+      <a href="#" id="forgot-pass" class="forgot-link"><u>Forgot Password</u>?</a>
+      <p id="forgot-msg" class="form-msg"></p>
+
+      <button type="submit" id="login-btn" class="btn action-btn login-btn">Login</button>
+
+      <!-- Google Sign-In -->
+      <div class="google-btn" id="google-signin-btn">
+        <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo"/>
+        <span>Sign in with Google</span>
+      </div>
+    </form>
+
+    <!-- Register Form -->
+    <form id="register-form" class="form">
+      <div class="input-group">
+        <input type="text" id="register-username" placeholder="Username" required />
+        <i class="fas fa-user icon-right"></i>
+      </div>
+
+      <div class="input-group">
+        <input type="email" id="register-email" placeholder="Email" required />
+        <i class="fas fa-envelope icon-right"></i>
+      </div>
+
+      <!-- Password field (Register) -->
+      <div class="input-group">
+        <i class="fas fa-lock lock-icon"></i>
+        <input type="password" id="register-password" placeholder="Password" required />
+        <button type="button" class="toggle-pass" aria-label="Show password">
+          <i class="fas fa-eye"></i>
+        </button>
+      </div>
+
+      <p id="register-msg" class="form-msg"></p>
+      <button type="submit" id="register-btn" class="btn action-btn register-btn">Register</button>
+
+      <!-- Google Sign-Up -->
+      <div class="google-btn">
+        <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo"/>
+        <span>Register with Google</span>
+      </div>
+    </form>
+
+    <!-- Switch link -->
+    <div class="switch-box">
+      <p id="switch-text">Don't have an account?</p>
+      <button id="switch-btn" type="button" class="btn switch-btn">Register</button>
+    </div>
+  </div>
+</div>
+
+<!-- ❌ REMOVED THE DUPLICATE INLINE SCRIPT THAT WAS HERE ❌ -->
+<!-- All JavaScript now handled by script.js below -->
+
+<script type="module" src="script.js"></script>
+</body>
+</html>
