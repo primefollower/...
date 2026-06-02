@@ -181,7 +181,6 @@ async function handlePaymentSuccess(orderId, response, packageData) {
 
 // ── 6. Main Payment Function ──
 
-// ── 6. Main Payment Function ──
 export async function buyWithCashfree(packageData) {
   const user = window.cashTreasureUser;
   if (!user) return showToast("Please login first", "error");
@@ -193,7 +192,6 @@ export async function buyWithCashfree(packageData) {
   if (btn) btn.disabled = true;
 
   try {
-    // ←←← UPDATE THIS URL WITH YOUR RAILWAY URL ←←←
     const backendUrl = "https://payment-backend-production-0b8d.up.railway.app";
 
     const res = await fetch(`${backendUrl}/create-order`, {
@@ -203,31 +201,33 @@ export async function buyWithCashfree(packageData) {
         amount: packageData.amount,
         userId: user.uid,
         username: user.username || "User",
-        email: user.email || "user@example.com",
-        followers: packageData.followers
+        email: user.email || "user@example.com"
       })
     });
 
     const data = await res.json();
+
+    console.log("Backend Response:", data);   // ← Added for debugging
 
     if (!data.success || !data.payment_session_id) {
       console.error("Backend error:", data);
       return showToast(data.message || "Failed to create payment session", "error");
     }
 
+    // Initialize Cashfree
     const cashfree = Cashfree({
-      mode: "production"   // Change to "production" when you go live
+      mode: "production"
     });
 
-    cashfree.checkout({
-      paymentSessionId: data.payment_session_id,
-      redirectTarget: "_self"   // Better for mobile
-    }).then(async (result) => {
+ cashfree.checkout({
+  paymentSessionId: data.payment_session_id,
+  redirectTarget: "_modal"
+}).then((result) => {
       console.log("Payment Success:", result);
       showToast("Payment Successful! 🎉", "success");
       document.getElementById('payment-success-modal')?.classList.add('visible');
     }).catch(err => {
-      console.error("Cashfree Error:", err);
+      console.error("Cashfree Checkout Error:", err);
       document.getElementById('payment-cancel-modal')?.classList.add('visible');
     });
 
