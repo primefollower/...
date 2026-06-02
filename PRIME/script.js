@@ -1141,7 +1141,7 @@ async function fetchGeminiResponse(messages) {
   }
 
 const response = await fetch(
-  'https://payment-backend-production-436d.up.railway.app/chat',
+  'https://payment-backend-production-0b8d.up.railway.app/chat',
   {
     method: 'POST',
     headers: {
