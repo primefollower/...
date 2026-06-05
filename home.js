@@ -140,16 +140,11 @@ window.renderCheckin = renderCheckin;
 
 // ── 6. Event Listeners ────────────────────────────────────────────────────────
 
-// Refer card → Coming Soon overlay
-document.getElementById("refer-card")?.addEventListener("click", () => {
-  document.getElementById("coming-soon-overlay")?.classList.add("visible");
-});
-
+// Refer card click is handled by refer.js — wireReferCardClick()
+// Coming soon close button kept for safety
 document.getElementById("coming-soon-close")?.addEventListener("click", () => {
   document.getElementById("coming-soon-overlay")?.classList.remove("visible");
 });
-
-
 
 
 // === SPIN COMING SOON POPUP ===

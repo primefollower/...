@@ -347,7 +347,70 @@ document.getElementById("celebration-close")?.addEventListener("click", () => {
   document.getElementById("celebration-overlay").classList.remove("visible");
 });
 
-// ── 10. Initialization ────────────────────────────────────────────────────────
+// ── 10. Order Progress Click → Show Details ───────────────────────────────────
+
+document.getElementById("order-progress")?.addEventListener("click", async () => {
+  const user = window.cashTreasureUser;
+  if (!user) return;
+
+  try {
+    const orders = await getActiveOrders(user.uid);
+    if (orders.length === 0) return;
+
+    const latest = orders[0];
+    const orderDate = latest.order_time?.toDate ? latest.order_time.toDate() : new Date();
+    const isPaid = latest.isPaidOrder === true;
+    const diffHours = (Date.now() - orderDate.getTime()) / (1000 * 60 * 60);
+
+    const costLine = document.getElementById('detail-cost-line');
+    const statusEl = document.getElementById('detail-status');
+
+    if (isPaid && costLine) {
+      costLine.innerHTML = `Cost: <span style="font-weight:800;">₹${latest.paidAmount || 0}</span>`;
+    } else if (costLine) {
+      costLine.innerHTML = `Credits Used: <span>${latest.credits_spent || 0}</span> <img src="icons/cashbag.png" style="height:18px;">`;
+    }
+
+    document.getElementById('detail-followers').textContent = latest.followers || 0;
+    document.getElementById('detail-date').textContent = orderDate.toLocaleDateString();
+    document.getElementById('detail-time').textContent = orderDate.toLocaleTimeString();
+
+    if (statusEl) {
+      if (isPaid) {
+        if (diffHours < 1) {
+          statusEl.textContent = "Pending";
+          statusEl.style.color = "red";
+        } else if (diffHours < 4) {
+          statusEl.textContent = "Processing";
+          statusEl.style.color = "orange";
+        } else if (diffHours < 24) {
+          statusEl.textContent = "Working";
+          statusEl.style.color = "#d4a017";
+        } else {
+          statusEl.textContent = "Delivered Successfully";
+          statusEl.style.color = "green";
+        }
+      } else {
+        if (diffHours < 1) {
+          statusEl.textContent = "Pending";
+          statusEl.style.color = "red";
+        } else if (diffHours < 24) {
+          statusEl.textContent = "Working";
+          statusEl.style.color = "orange";
+        } else {
+          statusEl.textContent = "Delivered Successfully";
+          statusEl.style.color = "green";
+        }
+      }
+    }
+
+    document.getElementById('order-detail-modal')?.classList.add('visible');
+  } catch (err) {
+    console.error("[Order] Progress click error:", err);
+  }
+});
+
+// ── 11. Initialization ────────────────────────────────────────────────────────
 
 window.addEventListener("userReady", async (e) => {
   await checkActiveOrders(e.detail.uid);
@@ -367,5 +430,11 @@ window.sendOrderEmail = function (data) {
     .then(() => console.log("[Order] Email sent"))
     .catch(err => console.error("[Order] Email error:", err));
 };
+
+
+
+// Make startCountdown available to pay.js
+window.startCountdown = startCountdown;
+
 
 console.log("✅ Order module loaded.");

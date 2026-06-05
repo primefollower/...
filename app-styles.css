@@ -2738,6 +2738,7 @@ body:has(#page-avatar.active) .bottom-nav {
   backdrop-filter: blur(8px);
   color: white;
   z-index: 5;
+  opacity: 0.6;
 }
 
 .refer-carousel-prev{
@@ -3213,4 +3214,35 @@ body:has(#page-avatar.active) .bottom-nav {
 @keyframes referUnlockedPulse {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.7; }
+}
+
+
+
+
+
+
+
+
+
+
+.golden-progress {
+  border: 3px solid #FFD700;
+  box-shadow: 0 0 25px rgba(255,215,0,0.6);
+}
+
+/* FORCE LOADER HIDE */
+#load2s-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  z-index: 99999;
+  transition: opacity 0.4s ease;
+}
+
+#load2s-overlay.hide,
+#load2s-overlay[style*="opacity: 0"] {
+  display: none !important;
 }

@@ -22,9 +22,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 
-<!-- Razorpay Checkout Script -->
-<script async src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
 
   <!-- AdSense (replace with your real pub ID) -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
@@ -36,7 +33,7 @@
 
   <!-- FULL SCREEN LOADER -->
 <div id="load2s-overlay">
-  <iframe src="LOAD2S/index.html" frameborder="0"></iframe>
+  <iframe src="load2s/index.html" frameborder="0"></iframe>
 </div>
 
   <!-- ═══ DESKTOP BLOCKING OVERLAY ═══ -->
@@ -729,6 +726,20 @@ Close
       <button class="btn-pay golden-pay-btn">PAY ₹199</button>
     </div>
 
+
+
+    <!-- NEW GOLDEN PROGRESS FOR PAID ORDERS -->
+<div class="order-progress golden-progress" id="buy-order-progress" style="display:none; margin-top:30px;">
+  <div style="background:linear-gradient(135deg,#FFD700,#FFA500); color:#1a1a2e; padding:20px; border-radius:20px; text-align:center;">
+    <h4 style="margin:0 0 12px 0; font-size:18px;">📦 Your Paid Order in Progress</h4>
+    <div class="progress-bar-container" style="background:rgba(0,0,0,0.2);">
+      <div class="progress-bar-fill" id="golden-progress-fill" style="background:linear-gradient(90deg,#1a1a2e,#FFD700);"></div>
+    </div>
+    <div class="countdown-timer" id="golden-countdown-timer" style="color:#1a1a2e; font-weight:700; margin-top:8px;">--:--:--</div>
+  </div>
+</div>
+
+
   </div>
 
   <div class="buy-bottom-text">
@@ -792,7 +803,7 @@ Close
 
     <!-- Referral Link -->
     <div class="refer-link-group">
-      <p class="refer-link-label">Your referral link</p>
+      <p class="refer-link-label">Your referral code</p>
       <div class="refer-link-row">
         <input
           id="refer-link-value"
@@ -802,7 +813,7 @@ Close
           value="Loading..."
           aria-label="Referral link"
         />
-        <button class="refer-copy-btn" id="refer-copy-btn" aria-label="Copy referral link">
+            <button class="refer-copy-btn" id="refer-copy-btn" aria-label="Copy referral code">
           <i class="fas fa-copy"></i>
         </button>
       </div>
@@ -843,6 +854,22 @@ Close
     </button>
   </div>
 
+
+
+
+      <!-- ── SECTION 4B: My Friends List ───────────────────────── -->
+    <div class="refer-block-card" style="margin-top:16px;">
+      <h3 class="refer-block-title">MY FRIENDS</h3>
+      <div id="refer-friends-list">
+        <p style="color:#9ca3af; opacity:0.7; text-align:center; font-size:14px; font-weight:600; padding:20px 0;">
+          YOU HAVEN'T REFER ANY FRIEND YET
+        </p>
+      </div>
+    </div>
+
+
+
+    
   <!-- ── SECTION 5: Claim Prime Viral Bonus ─────────────────── -->
   <div class="refer-claim-section" id="refer-claim-section" style="display:none;">
     <div class="refer-claim-card">
@@ -952,13 +979,13 @@ Close
 
 
 
-  <div class="modal-overlay" id="order-detail-modal">
-<div class="modal-content">
-  <div class="modal-box">
+  <div class="modal-overlay" id="order-detail-modal" style="align-items:center; justify-content:center; padding-top:0;">
+<div class="modal-content" style="display:flex; align-items:center; justify-content:center; min-height:100%;">
+  <div class="modal-box" style="margin:auto;">
 
-    <h3>Order Details</h3>
+    <h3 style="font-family:'Gravitas One',cursive; text-align:center; margin-bottom:18px;">Order Details</h3>
 
-    <p>Credits Used:
+    <p id="detail-cost-line">Credits Used:
       <span id="detail-credit-used"></span>
       <img src="icons/cashbag.png" style="height:18px;">
     </p>
@@ -980,6 +1007,39 @@ Close
 </div>
 
 </div> <!-- modal-overlay -->
+
+
+
+<!-- PAID ORDER PROGRESS -->
+<div class="order-progress golden-progress"
+id="buy-order-progress"
+style="display:none; margin-top:30px;">
+
+  <div style="
+    background:linear-gradient(135deg,#FFD700,#FFA500);
+    color:#1a1a2e;
+    padding:20px;
+    border-radius:20px;
+    text-align:center;
+  ">
+
+    <h4 style="margin:0 0 12px 0;">
+      📦 Your Paid Order in Progress
+    </h4>
+
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill"
+      id="golden-progress-fill"></div>
+    </div>
+
+    <div id="golden-countdown-timer"
+    class="countdown-timer">
+      --:--:--
+    </div>
+
+  </div>
+</div>
+
 
 
 <!-- PRIME AI Floating Button (Draggable) -->
@@ -1004,11 +1064,10 @@ Close
   <script type="module" src="contact.js"></script>
   <script type="module" src="more.js"></script>
   <script type="module" src="dailycheckin.js"></script>
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
   <script type="module" src="pay.js"></script>
   
 
-
-  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 
 
   <!-- MAIN APP SCRIPT -->

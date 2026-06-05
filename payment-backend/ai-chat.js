@@ -2,7 +2,6 @@ const express = require('express');
 const fetch = require('node-fetch');
 const router = express.Router();
 
-
 router.post('/chat', async (req, res) => {
 try {
 const { messages } = req.body;
@@ -16,7 +15,7 @@ const response = await fetch(
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      model: 'google/gemini-2.0-flash-001',
+          model: 'google/gemini-2.0-flash-exp',
       messages,
       temperature: 0.7,
       max_tokens: 200

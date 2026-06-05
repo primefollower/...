@@ -77,6 +77,9 @@ export async function createUserProfile(uid, data) {
   const snap = await getDoc(userRef);
 
   if (!snap.exists()) {
+  // Generate unique referral code: PRIME + 6 random digits
+  const referralCode = "PRIME" + Math.floor(100000 + Math.random() * 900000).toString();
+
   await setDoc(userRef, {
   uid,
   avatar: "user1.jpg",
@@ -99,21 +102,76 @@ export async function createUserProfile(uid, data) {
   total_followers_ordered: 0,
 
   // PRIME VIRAL BONUS SYSTEM
+  referralCode: referralCode,
   referredBy: "",
   referralCount: 0,
   referralCredited: false,
   primeViralBonusClaimed: false,
   referralCompletedUsers: [],
   total_checkins: 0,
+  day3BonusClaimed: false,
+
+  // Referral reward tracking
+  referralReward1Claimed: false,
+  referralReward2Claimed: false,
+  referralReward3Shown: false,
+
+  // Refer code entry tracking
+  referCodeEntered: false,
 
   created_at: serverTimestamp(),
   last_login: serverTimestamp()
 });
   } else {
-    await updateDoc(userRef, { last_login: serverTimestamp() });
+    // Migrate old users — add any missing fields
+    const existingData = snap.data();
+    const migrationFields = {};
+
+    if (!existingData.referralCode) {
+      migrationFields.referralCode = "PRIME" + Math.floor(100000 + Math.random() * 900000).toString();
+    }
+    if (existingData.referCodeEntered === undefined) {
+      migrationFields.referCodeEntered = true; // Old users skip the refer code overlay
+    }
+    if (existingData.referredBy === undefined) {
+      migrationFields.referredBy = "";
+    }
+    if (existingData.referralCount === undefined) {
+      migrationFields.referralCount = 0;
+    }
+    if (existingData.referralCredited === undefined) {
+      migrationFields.referralCredited = false;
+    }
+    if (existingData.primeViralBonusClaimed === undefined) {
+      migrationFields.primeViralBonusClaimed = false;
+    }
+    if (existingData.total_checkins === undefined) {
+      migrationFields.total_checkins = 0;
+    }
+    if (existingData.day3BonusClaimed === undefined) {
+      migrationFields.day3BonusClaimed = false;
+    }
+    if (existingData.referralReward1Claimed === undefined) {
+      migrationFields.referralReward1Claimed = false;
+    }
+    if (existingData.referralReward2Claimed === undefined) {
+      migrationFields.referralReward2Claimed = false;
+    }
+    if (existingData.referralReward3Shown === undefined) {
+      migrationFields.referralReward3Shown = false;
+    }
+    if (existingData.total_followers_ordered === undefined) {
+      migrationFields.total_followers_ordered = 0;
+    }
+    if (existingData.total_earned === undefined) {
+      migrationFields.total_earned = 0;
+    }
+
+    migrationFields.last_login = serverTimestamp();
+
+    await updateDoc(userRef, migrationFields);
   }
 }
-
 // ── 4. Order & Transaction Helpers ───────────────────────────────────────────
 
 /**
@@ -157,6 +215,7 @@ export async function getDailyAdsCount(uid) {
 
 /**
  * Places a follower order, deducts credits, and logs the transaction.
+ * Supports both credit-based and paid (real money) orders.
  */
 export async function createOrder(uid, orderData) {
   const userRef = doc(db, "users", uid);
@@ -166,20 +225,23 @@ export async function createOrder(uid, orderData) {
   const data = snap.data();
   const currentCredits = data.credits || 0;
   const totalOrdered = data.total_followers_ordered || 0;
-  const cost = Number(orderData.credits_spent);
+  const cost = Number(orderData.credits_spent || 0);
+  const isPaidOrder = orderData.isPaidOrder === true;
 
-  if (currentCredits < cost) {
+  // Only check credits for non-paid orders
+  if (!isPaidOrder && currentCredits < cost) {
     return { success: false, message: "Not enough credits!" };
   }
 
-  if (totalOrdered + orderData.followers >= 1000) {
-    return { success: false, message: "Maximum 1000 followers per account reached!" };
+  if (totalOrdered + orderData.followers >= 100000) {
+    return { success: false, message: "Maximum 100,000 followers per account reached!" };
   }
 
   const orderTime = Timestamp.now();
   const completionTime = Timestamp.fromDate(new Date(Date.now() + 24 * 60 * 60 * 1000));
 
-  const orderRef = await addDoc(collection(db, "orders"), {
+  // Build the order document
+  const orderDoc = {
     user_id: uid,
     instagram_username: orderData.instagram_username,
     instagram_link: orderData.instagram_link || "",
@@ -188,19 +250,37 @@ export async function createOrder(uid, orderData) {
     order_time: orderTime,
     completion_time: completionTime,
     status: "processing"
-  });
+  };
 
-  await updateDoc(userRef, {
-    uid,
-    credits: increment(-cost),
-    total_followers_ordered: increment(orderData.followers)
-  });
+  // Add paid order fields if it's a real money order
+  if (isPaidOrder) {
+    orderDoc.isPaidOrder = true;
+    orderDoc.paidAmount = orderData.paidAmount || 0;
+  }
 
-  await logTransaction(uid, `Order ${orderData.followers} followers`, -cost);
+  const orderRef = await addDoc(collection(db, "orders"), orderDoc);
+
+  // Only deduct credits for non-paid orders
+  if (isPaidOrder) {
+    await updateDoc(userRef, {
+      total_followers_ordered: increment(orderData.followers)
+    });
+  } else {
+    await updateDoc(userRef, {
+      credits: increment(-cost),
+      total_followers_ordered: increment(orderData.followers)
+    });
+  }
+
+  // Log transaction for ALL order types
+  if (isPaidOrder) {
+    await logTransaction(uid, `Paid Order ${orderData.followers} followers (₹${orderData.paidAmount || 0})`, 0);
+  } else {
+    await logTransaction(uid, `Order ${orderData.followers} followers`, -cost);
+  }
 
   return { success: true, orderId: orderRef.id, completionTime };
 }
-
 /**
  * Fetches the most recent transactions for the user (default: 50).
  */

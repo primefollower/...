@@ -131,15 +131,70 @@ document.addEventListener('click', (e) => {
   const txDate  = new Date(item.dataset.date || Date.now());
   const status  = getOrderStatus(txDate);
   const statusEl = document.getElementById('detail-status');
+  const costLine = document.getElementById('detail-cost-line');
+  const action = item.dataset.action || '';
+  const isPaid = action.toLowerCase().includes("paid");
+  const isViralBonus = action.toLowerCase().includes("prime viral bonus");
+  const isDay3Bonus = action.toLowerCase().includes("day 3 bonus");
 
-  document.getElementById('detail-credit-used').textContent = item.dataset.amount;
-  document.getElementById('detail-followers').textContent   = item.dataset.action.replace(/\D/g, "");
-  document.getElementById('detail-date').textContent        = txDate.toLocaleDateString();
-  document.getElementById('detail-time').textContent        = txDate.toLocaleTimeString();
+  // Show heading differently for viral bonus
+  const modalTitle = document.querySelector('#order-detail-modal .modal-box h3');
+
+  if (isViralBonus) {
+    if (modalTitle) {
+      modalTitle.textContent = "PRIME VIRAL BONUS";
+      modalTitle.style.color = "#FFD700";
+    }
+    if (costLine) costLine.innerHTML = `Cost: <span style="font-weight:800; color:#22c55e;">FREE</span>`;
+  } else if (isDay3Bonus) {
+    if (modalTitle) {
+      modalTitle.textContent = "DAY 3 BONUS";
+      modalTitle.style.color = "#60a5fa";
+    }
+    if (costLine) costLine.innerHTML = `Cost: <span style="font-weight:800; color:#22c55e;">FREE</span>`;
+  } else if (isPaid && costLine) {
+    if (modalTitle) {
+      modalTitle.textContent = "Order Details";
+      modalTitle.style.color = "";
+    }
+    // Extract amount from action like "Paid Order 200 followers (₹49)"
+    const amountMatch = action.match(/₹(\d+)/);
+    const rupees = amountMatch ? amountMatch[1] : '0';
+    costLine.innerHTML = `Cost: <span style="font-weight:800;">₹${rupees}</span>`;
+  } else if (costLine) {
+    if (modalTitle) {
+      modalTitle.textContent = "Order Details";
+      modalTitle.style.color = "";
+    }
+    const amt = item.dataset.amount || '0';
+    costLine.innerHTML = `Credits Used: <span id="detail-credit-used">${amt}</span> <img src="icons/cashbag.png" style="height:18px;">`;
+  }
+  
+  document.getElementById('detail-followers').textContent = action.replace(/\D/g, "").substring(0, 5) || "0";
+  document.getElementById('detail-date').textContent      = txDate.toLocaleDateString();
+  document.getElementById('detail-time').textContent      = txDate.toLocaleTimeString();
 
   if (statusEl) {
-    statusEl.textContent  = status.text;
-    statusEl.style.color  = status.color;
+    if (isPaid) {
+      // Paid order status: Pending(1h) → Processing(3h) → Working(20h) → Delivered
+      const diffHours = (Date.now() - txDate.getTime()) / (1000 * 60 * 60);
+      if (diffHours < 1) {
+        statusEl.textContent = "Pending";
+        statusEl.style.color = "red";
+      } else if (diffHours < 4) {
+        statusEl.textContent = "Processing";
+        statusEl.style.color = "orange";
+      } else if (diffHours < 24) {
+        statusEl.textContent = "Working";
+        statusEl.style.color = "#d4a017";
+      } else {
+        statusEl.textContent = "Delivered Successfully";
+        statusEl.style.color = "green";
+      }
+    } else {
+      statusEl.textContent = status.text;
+      statusEl.style.color = status.color;
+    }
   }
 
   document.getElementById('order-detail-modal')?.classList.add('visible');

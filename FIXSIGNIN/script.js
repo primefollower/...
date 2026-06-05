@@ -192,35 +192,57 @@ async function createUserProfile(user, username = null) {
     const docSnap = await getDoc(userRef);
     
     if (!docSnap.exists()) {
-      // Create new profile
+      // Generate unique referral code
+      const referralCode = "PRIME" + Math.floor(100000 + Math.random() * 900000).toString();
+
+      // Create new profile with ALL fields matching firebase.js
       await setDoc(userRef, {
         uid: user.uid,
+        avatar: "user1.jpg",
         email: user.email,
         username: username || user.displayName || user.email.split("@")[0],
-        displayName: user.displayName || username || "User",
-        photoURL: user.photoURL || null,
-     credits: 0,
-created_at: serverTimestamp(),
-last_login: serverTimestamp(),
-daily_ads_watched: 0,
-daily_ads_date: null,
-checkinDay: 0,
-checkinCycle: 0,
-lastCheckinDate: null,
-total_followers: 0,
-        emailVerified: user.emailVerified,
-        preferences: {
-          theme: "light",
-          language: "en",
-          notifications: true
-        }
+        credits: 0,
+        total_earned: 0,
+        daily_ads_watched: 0,
+        daily_ads_date: null,
+        daily_credits_earned: 0,
+
+        // Daily checkin
+        lastCheckinDate: null,
+        checkinDay: 0,
+        checkinCycle: 0,
+        last_checkin: null,
+        checkin_streak: 0,
+
+        // Followers
+        total_followers_ordered: 0,
+
+        // PRIME VIRAL BONUS SYSTEM
+        referralCode: referralCode,
+        referredBy: "",
+        referralCount: 0,
+        referralCredited: false,
+        primeViralBonusClaimed: false,
+        referralCompletedUsers: [],
+        total_checkins: 0,
+        day3BonusClaimed: false,
+
+        // Referral reward tracking
+        referralReward1Claimed: false,
+        referralReward2Claimed: false,
+        referralReward3Shown: false,
+
+        // Refer code entry tracking
+        referCodeEntered: false,
+
+        created_at: serverTimestamp(),
+        last_login: serverTimestamp()
       });
       console.log("✅ User profile created in Firestore!");
     } else {
       // Update existing profile (last login)
       await updateDoc(userRef, {
-       last_login: serverTimestamp(),
-        emailVerified: user.emailVerified
+        last_login: serverTimestamp()
       });
       console.log("✅ User profile updated!");
     }

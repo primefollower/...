@@ -24,10 +24,21 @@ import {
 import {
   onSnapshot,
   increment,
-  getDoc
+  getDoc,
+  query,
+  collection,
+  where,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 import { initReferPage } from "./refer.js";
+
+
+
+
+
+
+
 
 // Force persistent login — prevents auto-logout on tab close / refresh
 await setPersistence(auth, browserLocalPersistence);
@@ -107,8 +118,19 @@ function detectPrivateDNS() {
 function enforceMobileOnly() {
   const overlay = document.getElementById("desktop-overlay");
   if (!overlay) return;
-  overlay.style.display = isRealMobile() ? "none" : "flex";
-  document.documentElement.style.overflow = isRealMobile() ? "" : "hidden";
+  
+  const isMobile = isRealMobile();
+  overlay.style.display = isMobile ? "none" : "flex";
+  document.documentElement.style.overflow = isMobile ? "" : "hidden";
+  
+  // On desktop, immediately hide the loader so desktop overlay is visible
+  if (!isMobile) {
+    const loader = document.getElementById("load2s-overlay");
+    if (loader) {
+      loader.style.display = "none";
+      loader.classList.add("hide");
+    }
+  }
 }
 
 // Run on load and whenever the viewport changes
@@ -244,12 +266,16 @@ function navigateTo(pageId) {
   const navItem = document.querySelector(`.nav-item[data-page="${pageId}"]`);
   if (navItem) navItem.classList.add("active");
 
+  // Scroll to top when any page opens
+  window.scrollTo(0, 0);
+  document.getElementById("app-container")?.scrollTo(0, 0);
+  if (target) target.scrollTo(0, 0);
+
   // Restart PRIME VIRAL BONUS carousel when page opens
   if (pageId === "refer") {
     window.dispatchEvent(new CustomEvent("referPageOpened"));
   }
 }
-
 navItems.forEach(item => {
   item.addEventListener("click", async () => {
     const page = item.dataset.page;
@@ -307,16 +333,24 @@ onAuthStateChanged(auth, async (user) => {
       });
   }
 
-  // Populate global user state
-  window.cashTreasureUser = {
-    uid: user.uid,
-    email,
-    username,
-    credits,
-    avatar: profile?.avatar || "user1.jpg",
-    total_followers_ordered: profile?.total_followers_ordered || 0
-  };
+    // Referral code generation is now handled by firebase.js createUserProfile migration
+    // Re-fetch profile to get any migrated fields
+    if (profile && !profile.referralCode) {
+      const freshProfile = await getUserProfile(user.uid);
+      if (freshProfile) {
+        Object.assign(profile, freshProfile);
+      }
+    }
 
+    // Populate global user state
+    window.cashTreasureUser = {
+      uid: user.uid,
+      email,
+      username,
+      credits,
+      avatar: profile?.avatar || "user1.jpg",
+      total_followers_ordered: profile?.total_followers_ordered || 0
+    };
   // Live Firestore sync — updates credits and ad count in real time
   onSnapshot(doc(db, "users", user.uid), (snap) => {
     const data = snap.data();
@@ -344,7 +378,187 @@ window.dispatchEvent(
 
 // Init Refer Page
 initReferPage(window.cashTreasureUser);
+
+    // Show "Enter Refer Code" overlay ONLY for brand new signups (account created within last 60 seconds)
+    try {
+      if (profile && !profile.referCodeEntered && !profile.referredBy) {
+        const createdAt = profile.created_at?.toDate?.();
+        const isNewUser = createdAt && (Date.now() - createdAt.getTime()) < 60000;
+        if (isNewUser) {
+          showReferCodeEntryOverlay(user.uid);
+        } else {
+          // Old user — silently mark as entered so they never see it
+          await updateDoc(doc(db, "users", user.uid), { referCodeEntered: true });
+        }
+      }
+    } catch (referErr) {
+      console.warn("[ReferCode] Non-critical error:", referErr);
+    }
 });
+
+// ── Refer Code Entry Overlay ─────────────────────────────────────────────────
+
+function showReferCodeEntryOverlay(uid) {
+  document.querySelectorAll('.refer-code-entry-overlay').forEach(el => el.remove());
+
+  const overlay = document.createElement("div");
+  overlay.className = "refer-code-entry-overlay";
+  overlay.style.cssText = `
+    position:fixed; inset:0; background:rgba(0,0,0,0.85); display:flex;
+    align-items:center; justify-content:center; z-index:99999;
+    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  `;
+
+  overlay.innerHTML = `
+    <div style="background:linear-gradient(135deg,#0f172a,#1e293b); border-radius:24px;
+                padding:32px 24px; text-align:center; max-width:360px; width:92%;
+                box-shadow:0 20px 60px rgba(0,0,0,0.5); border:2px solid rgba(79,172,254,0.3);">
+      <div style="font-size:45px; margin-bottom:10px;">🎁</div>
+      <h2 style="color:#fff; font-size:22px; font-weight:900; margin-bottom:6px;">
+        Refer & Earn
+      </h2>
+      <p style="color:rgba(255,255,255,0.7); font-size:14px; margin-bottom:20px;">
+        Do you have a referral code?
+      </p>
+      <div style="position:relative; margin-bottom:18px;">
+        <input id="refer-code-input" type="text" maxlength="11"
+               style="width:100%; padding:16px 18px; border-radius:14px;
+                      border:2px solid rgba(79,172,254,0.3); background:rgba(255,255,255,0.08);
+                      color:#fff; font-size:16px; font-weight:700; text-align:center;
+                      letter-spacing:2px; outline:none; text-transform:uppercase;"
+               placeholder="">
+        <span id="refer-code-placeholder" style="position:absolute; top:50%; left:50%;
+              transform:translate(-50%,-50%); color:rgba(255,255,255,0.3); font-size:14px;
+              font-weight:600; pointer-events:none;">Optional</span>
+      </div>
+      <button id="refer-code-confirm-btn" style="
+        width:100%; padding:16px; border:none; border-radius:50px; font-size:17px;
+        font-weight:800; cursor:pointer; color:#fff;
+        background:linear-gradient(135deg,#ff6b81,#ff4466);
+        box-shadow:0 8px 25px rgba(255,68,102,0.4); margin-bottom:12px;
+      ">Confirm</button>
+      <button id="refer-code-skip-btn" style="
+        width:100%; padding:14px; border:none; border-radius:50px; font-size:14px;
+        font-weight:600; cursor:pointer; color:#94a3b8; background:rgba(255,255,255,0.08);
+      ">I don't have a refer code</button>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  const input = document.getElementById("refer-code-input");
+  const placeholder = document.getElementById("refer-code-placeholder");
+  const confirmBtn = document.getElementById("refer-code-confirm-btn");
+  const skipBtn = document.getElementById("refer-code-skip-btn");
+
+  // Remove placeholder on focus
+  input.addEventListener("focus", () => { placeholder.style.display = "none"; });
+  input.addEventListener("blur", () => {
+    if (!input.value.trim()) placeholder.style.display = "block";
+  });
+
+  // Skip button — close overlay, mark as entered
+  skipBtn.addEventListener("click", async () => {
+    try {
+      await updateDoc(doc(db, "users", uid), { referCodeEntered: true });
+    } catch (e) { console.warn(e); }
+    overlay.remove();
+  });
+
+  // Confirm button — verify code
+  confirmBtn.addEventListener("click", async () => {
+    const code = input.value.trim().toUpperCase();
+
+    if (!code) {
+      showToast("Please enter a referral code", "error");
+      return;
+    }
+
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = "Verifying...";
+    confirmBtn.style.opacity = "0.6";
+
+    try {
+      // Search for user with this referral code
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("referralCode", "==", code));
+      const snap = await getDocs(q);
+
+      if (snap.empty) {
+        showToast("Invalid code", "error");
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = "Confirm";
+        confirmBtn.style.opacity = "1";
+        return;
+      }
+
+      const inviterDoc = snap.docs[0];
+      const inviterUid = inviterDoc.id;
+
+      // Can't refer yourself
+      if (inviterUid === uid) {
+        showToast("You can't use your own code", "error");
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = "Confirm";
+        confirmBtn.style.opacity = "1";
+        return;
+      }
+
+      // Save referral
+      await updateDoc(doc(db, "users", uid), {
+        referredBy: inviterUid,
+        referCodeEntered: true
+      });
+
+      // Show success after 3 seconds
+      confirmBtn.textContent = "Verifying...";
+      setTimeout(() => {
+        showToast("Successful", "success");
+        overlay.remove();
+      }, 3000);
+
+    } catch (err) {
+      console.error("[ReferCode] Error:", err);
+      showToast("Something went wrong. Try again.", "error");
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = "Confirm";
+      confirmBtn.style.opacity = "1";
+    }
+  });
+}
+
+
+
+// Listen for completed payments even if user closed app
+async function checkPendingPayments(uid) {
+  try {
+    const q = query(
+      collection(db, "payment_events"),
+      where("userId", "==", uid),
+      where("processed", "==", false)
+    );
+    const snap = await getDocs(q);
+
+    for (const payDoc of snap.docs) {
+      const data = payDoc.data();
+      // Mark as processed first to prevent double-firing
+      await updateDoc(payDoc.ref, { processed: true });
+      // Delegate to pay.js handler via polling trigger
+      if (window.triggerPendingPaymentSuccess) {
+        await window.triggerPendingPaymentSuccess(data.orderId, data.amount, data.followers || 0);
+      }
+    }
+  } catch (err) {
+    console.error("[checkPendingPayments] Error:", err);
+  }
+}
+
+// Call it after userReady
+window.addEventListener("userReady", (e) => {
+  const uid = e.detail?.uid || e.detail;
+  if (uid) checkPendingPayments(uid);
+});
+
 
 // ── 8. Event Listeners ───────────────────────────────────────────────────────
 
@@ -461,20 +675,48 @@ document.getElementById("btn-watch-ad")?.addEventListener("click", () => {
 
 // ── 9. Initialization ─────────────────────────────────────────────────────────
 
-// Page loader fade-out
+// Force Loader Hide - Multiple strategies to prevent stuck black screen
+function hideLoader() {
+  const loader = document.getElementById("load2s-overlay");
+  if (!loader || loader.dataset.hidden === "true") return;
+  loader.dataset.hidden = "true";
+  
+  loader.style.transition = "opacity 0.5s ease";
+  loader.style.opacity = "0";
+  
+  setTimeout(() => {
+    loader.style.display = "none";
+    loader.classList.add("hide");
+  }, 500);
+}
+
+// Strategy 1: On window load
 window.addEventListener("load", () => {
+  setTimeout(hideLoader, 2500);
+  setTimeout(() => {
+    const loader = document.getElementById("load2s-overlay");
+    if (loader && loader.style.display !== "none") {
+      loader.style.display = "none";
+      loader.classList.add("hide");
+    }
+  }, 3500);
+  showDNSWarningIfNeeded();
+});
+
+// Strategy 2: On DOMContentLoaded (fires earlier than load)
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(hideLoader, 3000);
+});
+
+// Strategy 3: Absolute emergency fallback — runs no matter what
+setTimeout(hideLoader, 4000);
+setTimeout(() => {
   const loader = document.getElementById("load2s-overlay");
   if (loader) {
-    setTimeout(() => {
-      loader.style.transition = "opacity 0.5s ease";
-      loader.style.opacity = "0";
-      setTimeout(() => loader.remove(), 500);
-    }, 2200);
+    loader.style.display = "none";
+    loader.classList.add("hide");
   }
-
-  // DNS check runs after loader clears
-  setTimeout(showDNSWarningIfNeeded, 2600);
-});
+}, 5000);
 
 // Apply dark mode preference
 if (localStorage.getItem("darkMode") === "true") {
